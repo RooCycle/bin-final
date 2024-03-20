@@ -1,0 +1,1 @@
+web: gunicorn bincol_final.wsgi
