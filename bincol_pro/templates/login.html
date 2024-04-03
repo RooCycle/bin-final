@@ -51,15 +51,19 @@
         button[type="submit"]:hover {
             background-color: #0056b3;
         }
-        .error-message {
-            color: red;
+        .forgot-password {
+            text-align: center;
             margin-top: 10px;
+        }
+        .forgot-password a {
+            color: #007bff;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Login to your BinCol Account </h2>
+        <h2>Login to your BinCol Account</h2>
         {% if message %}
             <p>{{ message }}</p>
         {% endif %}
@@ -74,6 +78,9 @@
             <input type="password" name="password" required><br>
             <button type="submit">Login</button>
         </form>
+        <div class="forgot-password">
+            <a href="{% url 'password_reset_form' %}">Forgot Password?</a>
+        </div>
     </div>
 </body>
 </html>

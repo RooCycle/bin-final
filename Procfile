@@ -1,1 +1,1 @@
-web: gunicorn bincol_final.wsgi
+web: gunicorn bincol_final.wsgi --log-file -

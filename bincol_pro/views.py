@@ -12,6 +12,14 @@ from .models import UserProfile
 from .tokens import account_activation_token
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import authenticate, login as auth_login
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from django.contrib.auth.views import PasswordResetCompleteView
+from django.urls import reverse_lazy
 
 def signup(request):
     if request.method == 'POST':
@@ -73,7 +81,7 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None and user.is_active:
             auth_login(request, user)
-            return redirect('profile_create')
+            return redirect('dashboard')
         else:
             error_message = 'Invalid username or password'
             return render(request, 'login.html', {'error_message': error_message})
@@ -82,9 +90,115 @@ def user_login(request):
 def home(request):
     return render(request, 'home.html')
 
-def profile_create(request):
+#def profile_create(request):
     # We will add logic for creating profile here
-    return render(request, 'profile_create.html')
+    #return render(request, 'profile_create.html')
 
 """def profile_create(request, username): 
     return render(request, 'profile_create.html', {'username': username})"""
+
+@login_required
+def dashboard(request):
+    return render(request, 'dashboard.html', {'username': request.user.username})
+
+"""@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Update session to prevent logout
+            return redirect('dashboard')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {'form': form})"""
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            old_password = form.cleaned_data['old_password']
+            new_password1 = form.cleaned_data['new_password1']
+            new_password2 = form.cleaned_data['new_password2']
+            
+            # Check if old password is the same as new password
+            if old_password == new_password1:
+                messages.error(request, "Old password cannot be used as new password.")
+                return redirect('change_password')
+
+            # Check if new password contains mixed characters
+            if not any(char.isdigit() for char in new_password1) or not any(char.isalpha() for char in new_password1):
+                messages.error(request, "New password must contain both letters and digits.")
+                return redirect('change_password')
+
+            # Proceed with changing the password
+            user = form.save()
+            update_session_auth_hash(request, user)  # Update session to prevent logout
+            messages.success(request, "Password changed successfully.")
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Password change failed. Please try again.")
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {'form': form})
+
+def password_reset_form(request):
+    return render(request, 'password_reset_form.html')
+
+from .forms import ComplaintForm
+def lodge_complaint(request):
+    if request.method == 'POST':
+        form = ComplaintForm(request.POST)
+        if form.is_valid():
+            form.save()
+            # Optionally, you can redirect to a success page or perform other actions
+            return redirect('complaint_history')  # Replace 'success_page' with the name of your success page URL
+    else:
+        form = ComplaintForm()
+    return render(request, 'lodge_complaint.html', {'form': form})
+
+from django.shortcuts import render
+from .models import Complaint
+
+def complaint_history(request):
+    user_complaints = Complaint.objects.filter(user=request.user)
+    return render(request, 'complaint_history.html', {'user_complaints': user_complaints})
+
+import csv
+from django.shortcuts import render
+from .forms import CSVUploadForm
+from .models import Complaint
+
+@login_required
+def upload_complaints(request):
+    if request.method == 'POST':
+        form = CSVUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            csv_file = request.FILES['csv_file']
+            if csv_file.name.endswith('.csv'):
+                user = request.user
+                # Process the CSV file
+                complaints = []
+                decoded_file = csv_file.read().decode('utf-8').splitlines()
+                reader = csv.reader(decoded_file)
+                next(reader)  #skip the first row because its the title row
+                for row in reader:
+                    complaint = Complaint(
+                        user=user,
+                        number=row[0],  # Assuming Number is the first column
+                        subject=row[1],  # Assuming Subject is the second column
+                        description=row[2],  # Assuming Description is the third column
+                        status=row[3],  # Assuming Status is the fourth column
+                        # Add more fields as needed, adjust column indices accordingly
+                    )
+                    complaints.append(complaint)
+                # Bulk create complaints to improve performance
+                Complaint.objects.bulk_create(complaints)
+                messages.success(request, 'Complaints uploaded successfully.')
+            else:
+                messages.error(request, 'Invalid file format. Please upload a CSV file.')
+                return render(request, 'upload_complaints.html', {'form': form})
+    else:
+        form = CSVUploadForm()
+    return render(request, 'upload_complaints.html', {'form': form})
