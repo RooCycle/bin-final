@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bin List</title>
+</head>
+<body>
+    <h1>Bin List</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Bin Number</th>
+                <th>Location</th>
+                <th>Capacity</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bin in bins %}
+            <tr>
+                <td>{{ bin.bin_number }}</td>
+                <td>{{ bin.location }}</td>
+                <td>{{ bin.capacity }}</td>
+                <td>{{ bin.status }}</td>
+                <td>
+                    <a href="{% url 'edit_bin' bin.id %}">Edit</a> |
+                    <a href="{% url 'delete_bin' bin.id %}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'add_bin' %}">Add New Bin</a>
+</body>
+</html>

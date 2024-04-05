@@ -25,4 +25,8 @@ urlpatterns = [
     path('lodge_complaint/', views.lodge_complaint, name='lodge_complaint'),
     path('complaint_history/', views.complaint_history, name='complaint_history'),
     path('upload-complaints/', views.upload_complaints, name='upload_complaints'),
+    path('bin_list/', views.bin_list, name='bin_list'),
+    path('add_bin/', views.add_bin, name='add_bin'),
+    path('edit_bin/<int:bin_id>/', views.edit_bin, name='edit_bin'),
+    path('delete_bin/<int:bin_id>/', views.delete_bin, name='delete_bin'),
 ]

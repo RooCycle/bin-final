@@ -81,7 +81,12 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None and user.is_active:
             auth_login(request, user)
-            return redirect('dashboard')
+            # Check if the user is an admin
+            if user.is_staff and user.is_superuser:
+                return redirect('admin:index')  # Redirect to Django admin
+            else:
+                return redirect('dashboard') 
+            
         else:
             error_message = 'Invalid username or password'
             return render(request, 'login.html', {'error_message': error_message})
@@ -215,3 +220,55 @@ def dashboard(request):
         'is_user': is_user
     }
     return render(request, 'dashboard.html', context)
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Bin
+from .forms import BinForm
+
+def bin_list(request):
+    bins = Bin.objects.all()
+    return render(request, 'bin_list.html', {'bins': bins})
+
+def add_bin(request):
+    if request.method == 'POST':
+        form = BinForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('bin_list')
+    else:
+        form = BinForm()
+    return render(request, 'add_bin.html', {'form': form})
+
+def edit_bin(request, bin_id):
+    bin_instance = get_object_or_404(Bin, id=bin_id)
+    if request.method == 'POST':
+        form = BinForm(request.POST, instance=bin_instance)
+        if form.is_valid():
+            form.save()
+            return redirect('bin_list')
+    else:
+        form = BinForm(instance=bin_instance)
+    return render(request, 'edit_bin.html', {'form': form})
+
+def delete_bin(request, bin_id):
+    bin_instance = get_object_or_404(Bin, id=bin_id)
+    if request.method == 'POST':
+        bin_instance.delete()
+        return redirect('bin_list')
+    return render(request, 'delete_bin.html', {'bin': bin_instance})
+
+
+"""def assign_complaint(request, complaint_id):
+    complaint = Complaint.objects.get(pk=complaint_id)
+    if request.method == 'POST':
+        form = AssignComplaintForm(request.POST)
+        if form.is_valid():
+            assigned_to = form.cleaned_data['assigned_to']
+            complaint.assigned_to = assigned_to
+            complaint.save()
+            return redirect('complaint_history')  # Redirect to complaint history page
+    else:
+        form = AssignComplaintForm()
+    return render(request, 'assign_complaint.html', {'form': form})"""
+
+

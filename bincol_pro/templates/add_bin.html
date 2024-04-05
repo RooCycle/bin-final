@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Bin</title>
+</head>
+<body>
+    <h1>Add Bin</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="bin_number">Bin Number:</label>
+        <input type="text" id="bin_number" name="bin_number" required><br>
+        <label for="location">Location:</label>
+        <select id="location" name="location" required>
+            <option value="NSW">NSW</option>
+            <option value="Victoria">Victoria</option>
+            <option value="Queensland">Queensland</option>
+        </select><br>
+        <label for="capacity">Capacity:</label>
+        <select id="capacity" name="capacity" required>
+            <option value="100">100 litres</option>
+            <option value="200">200 litres</option>
+            <option value="300">300 litres</option>
+        </select><br>
+        <label for="status">Status:</label>
+        <select id="status" name="status" required>
+            <option value="Emptied">Emptied</option>
+            <option value="Filled">Filled</option>
+        </select><br>
+        <button type="submit">Add Bin</button>
+    </form>
+</body>
+</html>
