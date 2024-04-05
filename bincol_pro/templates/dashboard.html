@@ -45,7 +45,13 @@
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to Your Dashboard, {{ username }}!</h1>
+        {% if is_driver %}
+            <h1>Welcome, {{ request.user.username }}! You are a Driver.</h1>
+        {% elif is_user %}
+            <h1>Welcome, {{ request.user.username }}! You are an Ordinary User.</h1>
+        {% else %}
+            <h1>Welcome, {{ request.user.username }}! You are an Administrator.</h1>
+        {% endif %}
         <div class="button-container">
             <button onclick="window.location.href='{% url 'lodge_complaint' %}'">Lodge a Complaint</button>
             <button onclick="window.location.href='{% url 'complaint_history' %}'">Complaints History</button>

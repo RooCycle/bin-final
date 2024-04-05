@@ -202,3 +202,16 @@ def upload_complaints(request):
     else:
         form = CSVUploadForm()
     return render(request, 'upload_complaints.html', {'form': form})
+
+
+from django.contrib.auth.models import Group
+
+def dashboard(request):
+    user = request.user
+    is_driver = user.groups.filter(name='Drivers').exists()
+    is_user = user.groups.filter(name='Ordinary User').exists()
+    context = {
+        'is_driver': is_driver,
+        'is_user': is_user
+    }
+    return render(request, 'dashboard.html', context)
