@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="dashboard">
+    <h2>Admin Dashboard</h2>
+    <ul>
+        <li>New Complaints: {{ new_complaints }}</li>
+
+        <li>Assigned Complaints: {{ assigned_complaints }}</li>
+
+        <li>Rejected Complaints: {{ rejected_complaints }}</li>
+
+        <li>Completed Complaints: {{ completed_complaints }}</li>
+
+        <li>Total Drivers: {{ total_drivers }}</li>
+
+        <li>Total Full Bins: {{ total_full_bins }}</li>
+        
+        <li>Total Emptied Bins: {{ total_emptied_bins }}</li>
+    </ul>
+</div>
+{% endblock %}

@@ -54,3 +54,8 @@ class BinAdmin(admin.ModelAdmin):
 
 admin.site.register(Bin, BinAdmin)
 
+from django.contrib import admin
+from .views import admin_dashboard
+
+#admin.site.register_view('dashboard/', view=admin_dashboard, name='admin_dashboard')
+

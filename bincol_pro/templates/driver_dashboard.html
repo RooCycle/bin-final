@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        form {
+            display: inline;
+        }
+
+        select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="container">
+        <h1>Welcome, {{ username }}! You are a Driver</h1>
+
+        <div class="section">
+            <h2>Assigned Complaints</h2>
+            {% if assigned_complaints %}
+            <ul>
+                {% for complaint in assigned_complaints %}
+                <li>
+                    {{ complaint.subject }}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="complaint_id" value="{{ complaint.id }}">
+                        <select name="new_status">
+                            <option value="Pending" {% if complaint.status == 'Pending' %} selected {% endif %}>Pending</option>
+                            <option value="In Progress" {% if complaint.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                            <option value="Resolved" {% if complaint.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No assigned complaints.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>In Progress Complaints</h2>
+            {% if in_progress_complaints %}
+            <ul>
+                {% for complaint in in_progress_complaints %}
+                <li>{{ complaint.subject }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No complaints in progress.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>Resolved Complaints</h2>
+            {% if resolved_complaints %}
+            <ul>
+                {% for complaint in resolved_complaints %}
+                <li>{{ complaint.subject }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No resolved complaints.</p>
+            {% endif %}
+        </div>
+
+        <div class="section">
+            <h2>Assigned Bins</h2>
+            {% if assigned_bins %}
+            <ul>
+                {% for bin in assigned_bins %}
+                <li>
+                    Bin Number: {{ bin.bin_number }}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="bin_id" value="{{ bin.id }}">
+                        <select name="new_status">
+                            <option value="Filled" {% if bin.status == 'Filled' %} selected {% endif %}>Filled</option>
+                            <option value="Emptied" {% if bin.status == 'Emptied' %} selected {% endif %}>Emptied</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No assigned bins.</p>
+            {% endif %}
+        </div>
+
+        <p>Total Bins Emptied: {{ total_bins_emptied }}</p>
+    </div>
+</body>
+</html>

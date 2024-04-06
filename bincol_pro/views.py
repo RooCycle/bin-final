@@ -271,4 +271,86 @@ def delete_bin(request, bin_id):
         form = AssignComplaintForm()
     return render(request, 'assign_complaint.html', {'form': form})"""
 
+from django.shortcuts import render
+from .models import Complaint, Bin
+from django.contrib.auth.models import User, Group
+
+def admin_dashboard(request):
+    # Retrieve necessary data
+    new_complaints = Complaint.objects.filter(status='Pending').count()
+    assigned_complaints = Complaint.objects.exclude(assigned_to=None).count()
+    rejected_complaints = Complaint.objects.filter(status='Rejected').count()
+    completed_complaints = Complaint.objects.filter(status='Resolved').count()
+    total_drivers = User.objects.filter(groups__name='Drivers').count()
+    total_full_bins = Bin.objects.filter(status='Filled').count()
+    total_emptied_bins = Bin.objects.filter(status='Emptied').count()
+
+    # Print the values to check if they are fetched correctly
+    print("New Complaints:", new_complaints)
+    print("Assigned Complaints:", assigned_complaints)
+    print("Rejected Complaints:", rejected_complaints)
+    print("Completed Complaints:", completed_complaints)
+    print("Total Drivers:", total_drivers)
+    print("Total Full Bins:", total_full_bins)
+    print("Total Emptied Bins:", total_emptied_bins)
+
+   
+    context = {
+        'new_complaints': new_complaints,
+        'assigned_complaints': assigned_complaints,
+        'rejected_complaints': rejected_complaints,
+        'completed_complaints': completed_complaints,
+        'total_drivers': total_drivers,
+        'total_full_bins': total_full_bins,
+        'total_emptied_bins': total_emptied_bins,
+    }
+
+    return render(request, 'admin/index.html', context)
+
+from django.contrib import messages
+from .models import Complaint, Bin
+
+@login_required
+def driver_dashboard(request):
+    # Check if the user belongs to the "Drivers" group
+    if request.user.groups.filter(name='Drivers').exists():
+        # Fetch data for the driver dashboard
+        assigned_complaints = Complaint.objects.filter(assigned_to=request.user)
+        in_progress_complaints = Complaint.objects.filter(status='In Progress', assigned_to=request.user)
+        resolved_complaints = Complaint.objects.filter(status='Resolved', assigned_to=request.user)
+        assigned_bins = Bin.objects.filter(assigned_driver=request.user)
+        total_bins_emptied = Bin.objects.filter(assigned_driver=request.user, status='Emptied').count()
+
+        # Handle POST request to update bin status
+        if request.method == 'POST':
+            if 'bin_number' in request.POST:  # Update bin status
+                bin_id = request.POST.get('bin_number')
+                new_status = request.POST.get('new_status')
+                # Update the status of the bin
+                bin_instance = Bin.objects.get(pk=bin_id)
+                bin_instance.status = new_status
+                bin_instance.save()
+                messages.success(request, "Bin status updated successfully")
+            elif 'number' in request.POST:  # Update complaint status
+                complaint_id = request.POST.get('number')
+                new_status = request.POST.get('new_status')
+                # Update the status of the complaint
+                complaint = Complaint.objects.get(pk=complaint_id)
+                complaint.status = new_status
+                complaint.save()
+                messages.success(request, "Complaint status updated successfully")
+
+        return render(request, 'driver_dashboard.html', {
+            'assigned_complaints': assigned_complaints,
+            'in_progress_complaints': in_progress_complaints,
+            'resolved_complaints': resolved_complaints,
+            'assigned_bins': assigned_bins,
+            'total_bins_emptied': total_bins_emptied,
+            'username': request.user.username  # Pass the username to the template
+        })
+    else:
+        # Display error message
+        messages.error(request, "Access Denied: You are not authorized as a driver")
+        return redirect('home')  # Redirect to home or any other page
+
 

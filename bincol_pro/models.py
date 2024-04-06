@@ -5,6 +5,8 @@ class Complaint(models.Model):
     STATUS_CHOICES = (
         ('Pending', 'Pending'),
         ('Resolved', 'Resolved'),
+        ('Rejected', 'Rejected'),
+        ('In Progress', 'In Progress'),
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

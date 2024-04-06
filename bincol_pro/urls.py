@@ -4,6 +4,7 @@ from django.contrib.auth.views import PasswordResetDoneView, PasswordResetConfir
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetCompleteView
+from .views import admin_dashboard
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -29,4 +30,7 @@ urlpatterns = [
     path('add_bin/', views.add_bin, name='add_bin'),
     path('edit_bin/<int:bin_id>/', views.edit_bin, name='edit_bin'),
     path('delete_bin/<int:bin_id>/', views.delete_bin, name='delete_bin'),
+    #path('admin/', admin.site.urls),
+    path('admin/dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('driver-dashboard/', views.driver_dashboard, name='driver_dashboard'),
 ]
