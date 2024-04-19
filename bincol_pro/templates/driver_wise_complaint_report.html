@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver-wise Complaint Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="date"],
+        select {
+            width: calc(100% - 22px);
+            padding: 8px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            width: 100%;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        p {
+            text-align: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>Driver-wise Complaint Report</h1>
+    <form method="post" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <label for="driver_id">Select Driver:</label>
+        <select name="driver_id" id="driver_id">
+            {% for driver in drivers %}
+                <option value="{{ driver.id }}">{{ driver.username }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="start_date">Start Date:</label>
+        <input type="date" name="start_date" id="start_date">
+        <br>
+        <label for="end_date">End Date:</label>
+        <input type="date" name="end_date" id="end_date">
+        <br>
+        <button type="submit">Generate Report</button>
+    </form>
+
+    <!-- Display report results -->
+    {% if complaints %}
+        <h2>Complaints:</h2>
+        <ul>
+            {% for complaint in complaints %}
+                <li>{{ complaint.number }} - {{ complaint.subject }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No complaints found for the selected driver and date range.</p>
+    {% endif %}
+
+    <script>
+        function validateForm() {
+            var startDate = document.getElementById("start_date").value;
+            var endDate = document.getElementById("end_date").value;
+
+            // Check if either start date or end date is empty
+            if (!startDate || !endDate) {
+                alert("Please enter both start date and end date.");
+                return false;
+            }
+
+            // Validate date format (YYYY-MM-DD)
+            var dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+                alert("Invalid date format. Please use YYYY-MM-DD format.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

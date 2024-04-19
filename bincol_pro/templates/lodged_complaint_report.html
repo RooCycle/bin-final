@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lodged Complaint Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        input[type="date"],
+        button {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lodged Complaint Report</h1>
+    <form method="POST" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date">
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date">
+        <button type="submit">Generate Report</button>
+    </form>
+    
+    {% if start_date and end_date %}
+        <p>Date Range: {{ start_date }} to {{ end_date }}</p>
+
+        <h2>Assigned Complaints</h2>
+        <ul>
+            {% for complaint in assigned_complaints %}
+                <li>{{ complaint.subject }} - {{ complaint.status }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Resolved Complaints</h2>
+        <ul>
+            {% for complaint in resolved_complaints %}
+                <li>{{ complaint.subject }} - {{ complaint.status }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Pending Complaints</h2>
+        <ul>
+            {% for complaint in pending_complaints %}
+                <li>{{ complaint.subject }} - {{ complaint.status }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <script>
+        function validateForm() {
+            var startDate = document.getElementById("start_date").value;
+            var endDate = document.getElementById("end_date").value;
+
+            if (startDate === "" || endDate === "") {
+                alert("Please select both start and end dates.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

@@ -88,7 +88,7 @@ def user_login(request):
                 return redirect('dashboard') 
             
         else:
-            error_message = 'Invalid username or password'
+            error_message = 'Invalid username or password: please check and try again'
             return render(request, 'login.html', {'error_message': error_message})
     return render(request, 'login.html')
 
@@ -275,27 +275,19 @@ from django.shortcuts import render
 from .models import Complaint, Bin
 from django.contrib.auth.models import User, Group
 
+from django.shortcuts import render
+from .models import Complaint, Bin, User
+
 def admin_dashboard(request):
-    # Retrieve necessary data
     new_complaints = Complaint.objects.filter(status='Pending').count()
-    assigned_complaints = Complaint.objects.exclude(assigned_to=None).count()
+    assigned_complaints = Complaint.objects.filter(status='Assigned').count()
     rejected_complaints = Complaint.objects.filter(status='Rejected').count()
     completed_complaints = Complaint.objects.filter(status='Resolved').count()
     total_drivers = User.objects.filter(groups__name='Drivers').count()
     total_full_bins = Bin.objects.filter(status='Filled').count()
     total_emptied_bins = Bin.objects.filter(status='Emptied').count()
 
-    # Print the values to check if they are fetched correctly
-    print("New Complaints:", new_complaints)
-    print("Assigned Complaints:", assigned_complaints)
-    print("Rejected Complaints:", rejected_complaints)
-    print("Completed Complaints:", completed_complaints)
-    print("Total Drivers:", total_drivers)
-    print("Total Full Bins:", total_full_bins)
-    print("Total Emptied Bins:", total_emptied_bins)
-
-   
-    context = {
+    return render(request, 'admin/index.html', {
         'new_complaints': new_complaints,
         'assigned_complaints': assigned_complaints,
         'rejected_complaints': rejected_complaints,
@@ -303,54 +295,350 @@ def admin_dashboard(request):
         'total_drivers': total_drivers,
         'total_full_bins': total_full_bins,
         'total_emptied_bins': total_emptied_bins,
-    }
+    })
 
-    return render(request, 'admin/index.html', context)
 
 from django.contrib import messages
 from .models import Complaint, Bin
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
 @login_required
 def driver_dashboard(request):
-    # Check if the user belongs to the "Drivers" group
     if request.user.groups.filter(name='Drivers').exists():
         # Fetch data for the driver dashboard
         assigned_complaints = Complaint.objects.filter(assigned_to=request.user)
         in_progress_complaints = Complaint.objects.filter(status='In Progress', assigned_to=request.user)
         resolved_complaints = Complaint.objects.filter(status='Resolved', assigned_to=request.user)
+        new_complaints = Complaint.objects.filter(status='Pending', assigned_to=request.user)
         assigned_bins = Bin.objects.filter(assigned_driver=request.user)
         total_bins_emptied = Bin.objects.filter(assigned_driver=request.user, status='Emptied').count()
 
-        # Handle POST request to update bin status
+        # Pagination for assigned bins
+        paginator = Paginator(assigned_bins, 10)  # Show 10 bins per page
+        page = request.GET.get('page')
+        assigned_bins_page = paginator.get_page(page)
+
+        # Pagination for assigned complaints
+        paginator = Paginator(assigned_complaints, 10)  # Show 10 complaints per page
+        page_number = request.GET.get('page')
+        assigned_complaints_page = paginator.get_page(page_number)
+
+        # Handle POST request to update bin status or complaint status
         if request.method == 'POST':
-            if 'bin_number' in request.POST:  # Update bin status
-                bin_id = request.POST.get('bin_number')
-                new_status = request.POST.get('new_status')
-                # Update the status of the bin
+            if 'bin_id' in request.POST:
+                bin_id = request.POST.get('bin_id')
+                new_bin_status = request.POST.get('new_status')
                 bin_instance = Bin.objects.get(pk=bin_id)
-                bin_instance.status = new_status
+                bin_instance.status = new_bin_status
                 bin_instance.save()
                 messages.success(request, "Bin status updated successfully")
-            elif 'number' in request.POST:  # Update complaint status
-                complaint_id = request.POST.get('number')
-                new_status = request.POST.get('new_status')
-                # Update the status of the complaint
-                complaint = Complaint.objects.get(pk=complaint_id)
-                complaint.status = new_status
-                complaint.save()
+            elif 'complaint_id' in request.POST:
+                complaint_id = request.POST.get('complaint_id')
+                new_complaint_status = request.POST.get('new_status')
+                #complaint_instance = Complaint.objects.get(pk=complaint_id)
+                complaint_instance = get_object_or_404(Complaint, pk=complaint_id)
+                complaint_instance.status = new_complaint_status
+                complaint_instance.save()
                 messages.success(request, "Complaint status updated successfully")
 
+        # Handle search queries
+        bin_id_query = request.GET.get('bin_id')
+        complaint_number_query = request.GET.get('complaint_number')
+
+        if bin_id_query:
+            assigned_bins = assigned_bins.filter(bin_number__icontains=bin_id_query)
+        if complaint_number_query:
+            assigned_complaints = assigned_complaints.filter(number=complaint_number_query)
+
         return render(request, 'driver_dashboard.html', {
+            'assigned_complaints_page': assigned_complaints_page,
+            'new_complaints': new_complaints,
             'assigned_complaints': assigned_complaints,
             'in_progress_complaints': in_progress_complaints,
             'resolved_complaints': resolved_complaints,
+            'assigned_bins_page': assigned_bins_page,
             'assigned_bins': assigned_bins,
             'total_bins_emptied': total_bins_emptied,
-            'username': request.user.username  # Pass the username to the template
+            'username': request.user.username,
+            'updated_bin_status': new_bin_status if 'new_status' in locals() else None,
+            'updated_complaint_status': new_complaint_status if 'new_status' in locals() else None
         })
     else:
-        # Display error message
         messages.error(request, "Access Denied: You are not authorized as a driver")
-        return redirect('home')  # Redirect to home or any other page
+        return redirect('dashboard')  # Redirect to home or any other page
+  # Redirect to home or any other page
+    
+
+# views.py
+from django.shortcuts import render
+from .models import Bin
+
+def bin_report(request):
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        # Retrieve data based on date range
+        assigned_bins = Bin.objects.filter(
+            assigned_driver=request.user,
+            created_at__range=[start_date, end_date]
+        )
+        
+        bins_data = []
+        for bin in assigned_bins:
+            bin_data = {
+                'bin_number': bin.bin_number,
+                'status': 'Filled' if bin.status == 'Filled' else 'Emptied' if bin.status == 'Emptied' else 'Unknown',
+                'date': bin.created_at if bin.status == 'Filled' else None
+            }
+            bins_data.append(bin_data)
+        
+        return render(request, 'bin_report.html', {
+            'start_date': start_date,
+            'end_date': end_date,
+            'bins_data': bins_data,
+        })
+    else:
+        return render(request, 'bin_report.html')
+    
+def lodged_complaint_report(request):
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        # Retrieve data based on date range
+        assigned_complaints = Complaint.objects.filter(
+            assigned_to=request.user,
+            created_at__range=[start_date, end_date]
+        )
+        resolved_complaints = Complaint.objects.filter(
+            assigned_to=request.user,
+            status='Resolved',
+            created_at__range=[start_date, end_date]
+        )
+        pending_complaints = Complaint.objects.filter(
+            assigned_to=request.user,
+            status='Pending',
+            created_at__range=[start_date, end_date]
+        )
+        
+        return render(request, 'lodged_complaint_report.html', {
+            'start_date': start_date,
+            'end_date': end_date,
+            'assigned_complaints': assigned_complaints,
+            'resolved_complaints': resolved_complaints,
+            'pending_complaints': pending_complaints,
+        })
+    else:
+        return render(request, 'lodged_complaint_report.html')
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import Group
+
+
+from django.contrib import messages
+from django.shortcuts import redirect, render
+
+@login_required
+def ordinary_user_dashboard(request):
+    # Check if the user is in the "Ordinary User" group
+    if request.user.groups.filter(name='Ordinary User').exists():
+        # Render the ordinary user dashboard template
+        return render(request, 'ordinary_user_dashboard.html')
+    else:
+        # Add a message informing the user they don't have access
+        messages.warning(request, "You don't have permission to access the Ordinary User Dashboard.")
+        # Redirect the user back to the main dashboard page
+        return redirect('dashboard')
+
+
+def search_complaint(request):
+    if request.method == 'GET':
+        complaint_number = request.GET.get('complaint_number', '')
+        user_complaints = Complaint.objects.filter(user=request.user)
+        if complaint_number:
+            complaint = user_complaints.filter(number=complaint_number).first()
+            if complaint:
+                context = {'user_complaints': user_complaints, 'search_result': complaint}
+            else:
+                context = {'user_complaints': user_complaints, 'search_result': None, 'no_result': True}
+            return render(request, 'complaint_history.html', context)
+        else:
+            return render(request, 'complaint_history.html', {'user_complaints': user_complaints})
+    
+from django.shortcuts import render
+from .models import Bin
+from django.utils import timezone
+
+def bin_emptying_report(request):
+    emptied_bins = []
+    start_date = None
+    end_date = None
+
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        emptied_bins = Bin.objects.filter(
+            status='Emptied',
+            created_at__range=[start_date, end_date]
+        )
+
+    return render(request, 'bin_emptying_report.html', {
+        'emptied_bins': emptied_bins,
+        'start_date': start_date,
+        'end_date': end_date,
+    })
+
+from django.shortcuts import render
+from .models import Bin
+
+def driver_wise_bin_emptying_report(request):
+    drivers_group = Group.objects.get(name='Drivers')
+    drivers = User.objects.filter(groups__in=[drivers_group])
+    
+    if request.method == 'POST':
+        # Retrieve form data including driver and date range
+        driver_username = request.POST.get('driver_username')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        # Query bins based on the selected driver and date range
+        bins = Bin.objects.filter(assigned_driver__username=driver_username, created_at__range=[start_date, end_date])
+
+        return render(request, 'driver_wise_bin_emptying_report.html', {'bins': bins, 'drivers': drivers})
+    else:
+        return render(request, 'driver_wise_bin_emptying_report.html', {'drivers': drivers})
+
+from django.shortcuts import render
+from .models import Complaint
+
+def lodged_complaints_report(request):
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        # Query lodged complaints within the specified date range
+        complaints = Complaint.objects.filter(created_at__range=[start_date, end_date])
+        
+        return render(request, 'lodged_complaints_report.html', {'complaints': complaints, 'form_submitted': True})
+    else:
+        # If the request method is not POST, render the empty form
+        return render(request, 'lodged_complaints_report.html', {'form_submitted': False})
+    
+from django.shortcuts import render
+from .models import Complaint
+from django.contrib.auth.models import User, Group
+
+def driver_wise_complaint_report(request):
+    # Retrieve all users belonging to the 'Driver' group
+    drivers_group = Group.objects.get(name='Drivers')
+    drivers = User.objects.filter(groups__in=[drivers_group])
+    
+    if request.method == 'POST':
+        # Process form submission
+        driver_id = request.POST.get('driver_id')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        # Query complaints based on the selected driver and date range
+        complaints = Complaint.objects.filter(assigned_to=driver_id, created_at__range=[start_date, end_date])
+
+        return render(request, 'driver_wise_complaint_report.html', {'complaints': complaints, 'drivers': drivers})
+    else:
+        return render(request, 'driver_wise_complaint_report.html', {'drivers': drivers})
+
+
+# views.py
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import AboutUs, ContactUs
+
+def about_us(request):
+    about_page = AboutUs.objects.first()  # Assuming there's only one About Us page
+    return render(request, 'about_us.html', {'about_page': about_page})
+
+def contact_us(request):
+    contact_page = ContactUs.objects.first()  # Assuming there's only one Contact Us page
+    return render(request, 'contact_us.html', {'contact_page': contact_page})
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+from django.shortcuts import render
+from plotly.offline import plot
+import plotly.graph_objs as go
+from .models import Complaint
+
+def driver_complaint_status_chart(request):
+    # Retrieve complaint statuses for the specific driver
+    driver = request.user
+    pending_count = Complaint.objects.filter(assigned_to=driver, status='Pending').count()
+    in_progress_count = Complaint.objects.filter(assigned_to=driver, status='In Progress').count()
+    resolved_count = Complaint.objects.filter(assigned_to=driver, status='Resolved').count()
+
+    # Create the pie chart
+    labels = ['Pending', 'In Progress', 'Resolved']
+    values = [pending_count, in_progress_count, resolved_count]
+
+    trace = go.Pie(labels=labels, values=values)
+
+    # Generate the HTML for the chart
+    chart_div = plot([trace], output_type='div')
+
+    return render(request, 'driver_complaint_status_chart.html', {'chart_div': chart_div})
+
+
+# views.py
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Bin
+import json
+
+from django.shortcuts import render
+from plotly.offline import plot
+import plotly.graph_objs as go
+from .models import Bin
+
+def driver_bin_status_chart(request):
+    # Retrieve bin data for the specific driver
+    bins = Bin.objects.filter(assigned_driver=request.user)
+    
+    # Count bin statuses
+    filled_bins = bins.filter(status='Filled').count()
+    emptied_bins = bins.filter(status='Emptied').count()
+
+    # Create pie chart data
+    labels = ['Filled', 'Emptied']
+    values = [filled_bins, emptied_bins]
+
+    data = go.Pie(labels=labels, values=values)
+
+    # Generate plot
+    plot_div = plot([data], output_type='div', include_plotlyjs=False)
+
+    return render(request, 'driver_bin_status_chart.html', context={'plot_div': plot_div})
+
+
+from django.contrib.auth.views import LogoutView
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
+
+class CustomLogoutView(LogoutView):
+    next_page = reverse_lazy('home')  # Specify the URL name of your home page here
+
+
+
+
+
+
 
 

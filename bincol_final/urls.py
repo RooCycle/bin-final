@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from bincol_pro.views import CustomLogoutView
 
 urlpatterns = [
+    path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('admin/', admin.site.urls),
     path('', include('bincol_pro.urls')),
 ]

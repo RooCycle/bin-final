@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 class Complaint(models.Model):
     STATUS_CHOICES = (
@@ -29,6 +30,16 @@ class UserProfile(models.Model):
     password = models.CharField(max_length=100)
     is_active = models.BooleanField(default=False)
 
+class AboutUs(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+
+class ContactUs(models.Model):
+    title = models.CharField(max_length=100)
+    address = models.CharField(max_length=200)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+
 
 from django.db import models
 
@@ -53,10 +64,13 @@ class Bin(models.Model):
     bin_number = models.CharField(max_length=100, unique=True)
     location = models.CharField(max_length=3, choices=LOCATION_CHOICES)
     capacity = models.IntegerField(choices=CAPACITY_CHOICES)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Filled')
     assigned_driver = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(default=timezone.now)
 
 
     def __str__(self):
         return self.bin_number
+    
+
 

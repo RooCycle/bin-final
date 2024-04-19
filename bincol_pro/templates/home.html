@@ -10,15 +10,29 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
+            display: flex; /* Use flexbox for layout */
+            justify-content: center; /* Center align content horizontally */
         }
         .container {
-            max-width: 800px;
-            margin: 50px auto;
+            width: 80%; /* Set container width */
+            margin-top: 50px; /* Adjust as needed */
             padding: 20px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            text-align: center;
+            display: flex; /* Use flexbox for layout */
+        }
+        .main-content {
+            width: 70%; /* Set width of main content */
+            text-align: center; /* Center align content */
+            margin-right: 20px; /* Add margin to create space between main content and sidebar */
+        }
+        .sidebar {
+            width: 30%; /* Set width of sidebar */
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         h1 {
             color: #333;
@@ -44,15 +58,51 @@
         .button-container button:hover {
             background-color: #0056b3;
         }
+        /* Style for the images */
+        .image-container {
+            display: flex; /* Use flexbox for layout */
+            justify-content: center; /* Center align items horizontally */
+            align-items: center; /* Center align items vertically */
+            margin-top: 20px; /* Adjust as needed */
+        }
+        .centered-image {
+            width: 40%; /* Resize images to 40% of container width */
+            height: auto; /* Maintain aspect ratio */
+            margin: 0 10px; /* Add space between images */
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Welcome to BINCOL Waste Management System</h1>
-        <p>Empowering communities to manage waste effectively.</p>
-        <div class="button-container">
-            <button onclick="window.location.href='{% url 'signup' %}'">Sign Up</button>
-            <button onclick="window.location.href='{% url 'login' %}'">Sign In</button>
+        <div class="main-content">
+            <h1>Welcome to BINCOL Waste Management System</h1>
+            <p>Empowering communities to manage waste effectively.</p>
+            <div class="button-container">
+                <button onclick="window.location.href='{% url 'signup' %}'">Register</button>
+                <button onclick="window.location.href='{% url 'login' %}'">Log In</button>
+                <button onclick="window.location.href='{% url 'about_us' %}'">About Us</button>
+                <button onclick="window.location.href='{% url 'contact_us' %}'">Contact Us</button>
+            </div>
+            <!-- Image container -->
+            <div class="image-container">
+                <!-- First image -->
+                <img src="\static\home_bin.jpg" alt="Description of the first image" class="centered-image">
+                <!-- Second image -->
+                <img src="\static\home_bin_2.jpg" alt="Description of the second image" class="centered-image">
+            </div>
+            <!-- Buttons for Contact Us and About Us -->
+            
+        </div>
+        <div class="sidebar">
+            <h2>What We Do</h2>
+            <p>We are BINCOL Waste Management System, committed to providing sustainable waste management solutions.</p>
+            <p>Our services include:</p>
+            <ul>
+                <li>Bin collection and emptying</li>
+                <li>Complaints management</li>
+                <li>Driver management</li>
+                <li>Reporting</li>
+            </ul>
         </div>
     </div>
 </body>

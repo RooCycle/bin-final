@@ -140,6 +140,8 @@ EMAIL_HOST_PASSWORD = 'zwnexapivbuqbjpg'
 
 LOGIN_URL = '/login/'  # Example login URL, adjust as needed
 
+LOGOUT_REDIRECT_URL = 'home'
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collected Bin Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        input[type="date"] {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Collected Bin Report</h1>
+
+    <form method="post" onsubmit="return validateForm()">
+        {% csrf_token %}
+        <label for="start_date">Date Range:</label>
+        <input type="date" id="start_date" name="start_date">
+        <label for="end_date">to</label>
+        <input type="date" id="end_date" name="end_date">
+        <button type="submit">Generate Report</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Bin Number</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bin_data in bins_data %}
+            <tr>
+                <td>{{ bin_data.bin_number }}</td>
+                <td>{{ bin_data.status }}</td>
+                <td>{{ bin_data.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        function validateForm() {
+            var startDate = document.getElementById("start_date").value;
+            var endDate = document.getElementById("end_date").value;
+
+            if (startDate === "" || endDate === "") {
+                alert("Please select both start and end dates.");
+                return false;
+            }
+            return true;
+        }
+    </script>
+</body>
+</html>

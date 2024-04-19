@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bin Emptying Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        label {
+            margin-right: 10px;
+        }
+        input[type="date"] {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button[type="submit"] {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        h2 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+        .empty-message {
+            text-align: center;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bin Emptying Report</h1>
+        <form method="post" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date">
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date">
+            <button type="submit">Generate Report</button>
+        </form>
+
+        {% if start_date and end_date %}
+            <h2>Report for {{ start_date }} to {{ end_date }}</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bin Number</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th>Status</th>
+                        <th>Assigned Driver</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for bin in emptied_bins %}
+                    <tr>
+                        <td>{{ bin.bin_number }}</td>
+                        <td>{{ bin.get_location_display }}</td>
+                        <td>{{ bin.get_capacity_display }}</td>
+                        <td>{{ bin.status }}</td>
+                        <td>{{ bin.assigned_driver }}</td>
+                        <td>{{ bin.created_at }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty-message">No bins emptied within the specified date range.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+    <script>
+        function validateForm() {
+            var startDate = document.getElementById("start_date").value;
+            var endDate = document.getElementById("end_date").value;
+
+            // Check if either start date or end date is empty
+            if (!startDate || !endDate) {
+                alert("Please enter both start date and end date.");
+                return false;
+            }
+
+            // Validate date format (YYYY-MM-DD)
+            var dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(startDate) || !dateRegex.test(endDate)) {
+                alert("Invalid date format. Please use YYYY-MM-DD format.");
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ from django.contrib.auth.views import PasswordResetDoneView, PasswordResetConfir
 from django.contrib.auth import views as auth_views
 from django.urls import reverse_lazy
 from django.contrib.auth.views import PasswordResetCompleteView
-from .views import admin_dashboard
+
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -31,6 +31,20 @@ urlpatterns = [
     path('edit_bin/<int:bin_id>/', views.edit_bin, name='edit_bin'),
     path('delete_bin/<int:bin_id>/', views.delete_bin, name='delete_bin'),
     #path('admin/', admin.site.urls),
-    path('admin/dashboard/', admin_dashboard, name='admin_dashboard'),
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('driver-dashboard/', views.driver_dashboard, name='driver_dashboard'),
+    path('bin-report/', views.bin_report, name='bin_report'),
+    path('lodged-complaint-report/', views.lodged_complaint_report, name='lodged_complaint_report'),
+    path('ordinary-user-dashboard/', views.ordinary_user_dashboard, name='ordinary_user_dashboard'),
+    path('bin-emptying-report/', views.bin_emptying_report, name='bin_emptying_report'),
+    #path('driver-bin-emptying-report/', views.driver_bin_emptying_report, name='driver_bin_emptying_report'),
+    path('driver-wise-bin-emptying-report/', views.driver_wise_bin_emptying_report, name='driver_wise_bin_emptying_report'),
+    path('lodged-complaints-report/', views.lodged_complaints_report, name='lodged_complaints_report'),
+    path('driver-wise-complaint-report/', views.driver_wise_complaint_report, name='driver_wise_complaint_report'),
+    path('about-us/', views.about_us, name='about_us'),
+    path('contact-us/', views.contact_us, name='contact_us'),
+    path('logout/', views.logout_view, name='log_out'),
+    path('driver-complaint-chart/', views.driver_complaint_status_chart, name='driver_complaint_chart'),
+    path('driver-bin-chart/', views.driver_bin_status_chart, name='driver_bin_chart'),
+    #path('admin/logout/', views.custom_logout, name='admin_logout'),
 ]

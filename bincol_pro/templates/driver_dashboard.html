@@ -60,13 +60,83 @@
         .section {
             margin-bottom: 20px;
         }
+
+        .report-button {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        .nav-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            
+        }
+
+        .nav-buttons button {
+            margin-right: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+
+        .nav-buttons button:hover {
+            background-color: #0056b3;
+        }
+        .messages {
+        color: green; /* Set color to green */
+        font-weight: bold; /* Optional: Make the message text bold */
+        display: flex; /* Use flexbox */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        height: 20vh; /* Set height to full viewport height */
+}
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 200px;
+            height: 100%;
+            background-color: #333;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .sidebar img {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            margin-left: 220px;
+        }
+
+        
     </style>
 </head>
+<div class="sidebar">
+    <img src="/static/driver_sidebar.jpg" alt="Sidebar Image">
+</div>
+<div class="nav-buttons">
+    <button onclick="location.href='{% url 'home' %}'">Home</button>
+    <button onclick="location.href='/about-us/'">About Us</button>
+    <button onclick="location.href='/contact-us/'">Contact Us</button>
+    <button onclick="location.href={% url 'log_out' %}">Logout</a>
+</div>
 <body>
+    
     {% if messages %}
     <ul>
         {% for message in messages %}
-        <li>{{ message }}</li>
+        <li class="messages">{{ message }}</li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -80,10 +150,11 @@
             <ul>
                 {% for complaint in assigned_complaints %}
                 <li>
-                    {{ complaint.subject }}
+                    Complaint No: {{ complaint.number }} - {{ complaint.subject }}
                     <form method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="complaint_id" value="{{ complaint.id }}">
+                        
+                        <input type="hidden" name="complaint_number" value="{{ complaint.number }}">
                         <select name="new_status">
                             <option value="Pending" {% if complaint.status == 'Pending' %} selected {% endif %}>Pending</option>
                             <option value="In Progress" {% if complaint.status == 'In Progress' %} selected {% endif %}>In Progress</option>
@@ -94,6 +165,37 @@
                 </li>
                 {% endfor %}
             </ul>
+            <nav aria-label="Complaint Navigation">
+                <ul class="pagination">
+                    {% if assigned_complaints_page.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ assigned_complaints_page.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a class="page-link" href="?page={{ assigned_complaints_page.number }}">{{ assigned_complaints_page.number }}</a></li>
+                    {% if assigned_complaints_page.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ assigned_complaints_page.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="section">
+                <h2>Search Assigned Complaints</h2>
+                <form method="GET">
+                    <input type="text" name="complaint_number" placeholder="Enter Complaint Number">
+                    <button type="submit">Search</button>
+                </form>
+                <!-- Display search results -->
+                {% if assigned_complaints %}
+                <ul>
+                    {% for complaint in assigned_complaints %}
+                    <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
+                    {% endfor %}
+                </ul>
+                
+                {% else %}
+                <p>No assigned complaints found.</p>
+                {% endif %}
+                
+            </div>
+            
             {% else %}
             <p>No assigned complaints.</p>
             {% endif %}
@@ -104,7 +206,7 @@
             {% if in_progress_complaints %}
             <ul>
                 {% for complaint in in_progress_complaints %}
-                <li>{{ complaint.subject }}</li>
+                <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
                 {% endfor %}
             </ul>
             {% else %}
@@ -117,21 +219,21 @@
             {% if resolved_complaints %}
             <ul>
                 {% for complaint in resolved_complaints %}
-                <li>{{ complaint.subject }}</li>
+                <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
                 {% endfor %}
             </ul>
             {% else %}
             <p>No resolved complaints.</p>
             {% endif %}
         </div>
-
+        
         <div class="section">
             <h2>Assigned Bins</h2>
             {% if assigned_bins %}
             <ul>
                 {% for bin in assigned_bins %}
                 <li>
-                    Bin Number: {{ bin.bin_number }}
+                    Bin ID: {{ bin.id }} - Bin Number: {{ bin.bin_number }}
                     <form method="post">
                         {% csrf_token %}
                         <input type="hidden" name="bin_id" value="{{ bin.id }}">
@@ -144,12 +246,54 @@
                 </li>
                 {% endfor %}
             </ul>
+            
+            <nav aria-label="Bin Navigation">
+                <ul class="pagination">
+                    {% if assigned_bins_page.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ assigned_bins_page.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a class="page-link" href="?page={{ assigned_bins_page.number }}">{{ assigned_bins_page.number }}</a></li>
+                    {% if assigned_bins_page.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ assigned_bins_page.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
             {% else %}
             <p>No assigned bins.</p>
             {% endif %}
+            <div class="section">
+                <h2>Search Assigned Bins</h2>
+                <form method="GET">
+                    <input type="text" name="bin_id" placeholder="Enter Bin ID">
+                    <button type="submit">Search</button>
+                </form>
+                <!-- Display search results -->
+                {% if assigned_bins %}
+                <ul>
+                    {% for bin in assigned_bins %}
+                    <li>Bin ID: {{ bin.id }} - Bin Number: {{ bin.bin_number }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No assigned bins found.</p>
+                {% endif %}
+            </div>
         </div>
 
         <p>Total Bins Emptied: {{ total_bins_emptied }}</p>
     </div>
+    <div style="position: absolute; top: 20px; right: 20px;">
+        <a href="{% url 'bin_report' %}" style="text-decoration: none; background-color: #007bff; color: #fff; padding: 10px 20px; border-radius: 5px;">My Collected Bin Report</a>
+    </div>
+    <div style="position: absolute; top: 15px; right: 20px;">
+        <a href="{% url 'lodged_complaint_report' %}" class="report-button">My Lodged Complaints Report</a>
+    </div>
+    <div style="position: absolute; top: 100px; right: 20px;">
+        <a href="{% url 'driver_complaint_chart' %}" class="report-button">Compaints Distribution Chart</a>
+    </div>
+    <div style="position: absolute; top: 200px; right: 20px;">
+        <a href="{% url 'driver_bin_chart' %}" class="report-button">Bin Distribution Chart</a>
+    </div>
+    
 </body>
 </html>

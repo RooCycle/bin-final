@@ -31,7 +31,7 @@
         }
         input[type="text"],
         input[type="password"] {
-            width: 100%;
+            width: 80;
             padding: 8px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
@@ -39,7 +39,7 @@
             box-sizing: border-box;
         }
         button[type="submit"] {
-            width: 100%;
+            width: 80;
             padding: 10px;
             background-color: #007bff;
             color: #fff;
@@ -59,10 +59,43 @@
             color: #007bff;
             text-decoration: none;
         }
+        .centered-image {
+        display: block;
+        margin: 0 auto;
+        }
+        .error-message {
+        color: red;
+        }
+        .button-container {
+        margin-top: 30px;
+        text-align: center; /* Center align the buttons */
+        }
+        .button-container a {
+        display: inline-block;
+        width: auto;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none; /* Remove default underline */
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px; /* Add margin between buttons */
+        }
+        .button-container a:hover {
+        background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="button-container">
+        <div class="page-buttons">
+            <a href="{% url 'home' %}" class="button">Home</a>
+            <a href="{% url 'about_us' %}" class="button">About Us</a>
+            <a href="{% url 'contact_us' %}" class="button">Contact Us</a>
+        </div>
         <h2>Login to your BinCol Account</h2>
         {% if message %}
             <p>{{ message }}</p>
@@ -72,14 +105,19 @@
         {% endif %}
         <form action="{% url 'login' %}" method="post">
             {% csrf_token %}
-            <label for="username">Username:</label>
+            <label for="username">Username:</strong></label>
             <input type="text" name="username" required><br>
-            <label for="password">Password:</label>
+            <label for="password">Password:</strong></label>
             <input type="password" name="password" required><br>
             <button type="submit">Login</button>
         </form>
         <div class="forgot-password">
             <a href="{% url 'password_reset_form' %}">Forgot Password?</a>
+        </div>
+        <div class="image-container">
+            <!-- First image -->
+            <img src="\static\login_1.jpg" alt="Description of the first image" class="centered-image">
+            
         </div>
     </div>
 </body>
