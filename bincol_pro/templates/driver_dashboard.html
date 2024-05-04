@@ -168,14 +168,15 @@
             <nav aria-label="Complaint Navigation">
                 <ul class="pagination">
                     {% if assigned_complaints_page.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page={{ assigned_complaints_page.previous_page_number }}">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.previous_page_number }}">Previous</a></li>
                     {% endif %}
-                    <li class="page-item active"><a class="page-link" href="?page={{ assigned_complaints_page.number }}">{{ assigned_complaints_page.number }}</a></li>
+                    <li class="page-item active"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.number }}">{{ assigned_complaints_page.number }}</a></li>
                     {% if assigned_complaints_page.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ assigned_complaints_page.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.next_page_number }}">Next</a></li>
                     {% endif %}
                 </ul>
             </nav>
+            
             <div class="section">
                 <h2>Search Assigned Complaints</h2>
                 <form method="GET">
@@ -250,14 +251,15 @@
             <nav aria-label="Bin Navigation">
                 <ul class="pagination">
                     {% if assigned_bins_page.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page={{ assigned_bins_page.previous_page_number }}">Previous</a></li>
+                    <li class="page-item"><a class="page-link" href="?bin_page={{ assigned_bins_page.previous_page_number }}">Previous</a></li>
                     {% endif %}
-                    <li class="page-item active"><a class="page-link" href="?page={{ assigned_bins_page.number }}">{{ assigned_bins_page.number }}</a></li>
+                    <li class="page-item active"><a class="page-link" href="?bin_page={{ assigned_bins_page.number }}">{{ assigned_bins_page.number }}</a></li>
                     {% if assigned_bins_page.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ assigned_bins_page.next_page_number }}">Next</a></li>
+                    <li class="page-item"><a class="page-link" href="?bin_page={{ assigned_bins_page.next_page_number }}">Next</a></li>
                     {% endif %}
                 </ul>
             </nav>
+            
             {% else %}
             <p>No assigned bins.</p>
             {% endif %}

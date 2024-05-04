@@ -16,10 +16,64 @@
         h1 {
             color: #333;
             text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #chart-name-form {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        #chart-name-form label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .messages {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .success-message {
+            color: green;
+        }
+
+        .error-message {
+            color: red;
         }
 
         #complaint-status-chart {
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
             background-color: #fff;
             border-radius: 10px;
@@ -30,6 +84,27 @@
 </head>
 <body>
     <h1>Complaint Status Distribution</h1>
+
+    <!-- Display success and error messages -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <p class="{% if message.tags %}{{ message.tags }}-message{% endif %}">{{ message }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Display the form for chart name input -->
+    <div id="chart-name-form">
+        <form action="{% url 'save_chart' %}" method="post">
+            {% csrf_token %}
+            <label for="name">Enter a unique name for the chart:</label>
+            <input type="text" id="chart-name" name="name" required>
+            <!-- Hidden input field for the chart content -->
+            <input type="hidden" name="chart_div" value="{{ chart_div|safe }}">
+            <button type="submit">Save Chart</button>
+        </form>
+    </div>
 
     <!-- Display the pie chart -->
     <div id="complaint-status-chart">

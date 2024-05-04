@@ -46,5 +46,6 @@ urlpatterns = [
     path('logout/', views.logout_view, name='log_out'),
     path('driver-complaint-chart/', views.driver_complaint_status_chart, name='driver_complaint_chart'),
     path('driver-bin-chart/', views.driver_bin_status_chart, name='driver_bin_chart'),
-    #path('admin/logout/', views.custom_logout, name='admin_logout'),
+    path('admin_dashboard', views.admin_dashboard, name='admin_dashboard'),
+    path('save_chart/', views.save_chart, name='save_chart'),
 ]

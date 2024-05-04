@@ -23,7 +23,7 @@ class ComplaintAdmin(admin.ModelAdmin):
         # Filter users belonging to the "Drivers" group
         drivers = drivers_group.user_set.all()
         context = {'complaints': queryset, 'users': drivers}
-        return render(request, 'assign_complaint_to_user.html', context)
+        #return render(request, 'assign_complaint_to_user.html', context)
 
 admin.site.register(Complaint, ComplaintAdmin)
 

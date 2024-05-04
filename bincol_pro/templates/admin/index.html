@@ -1,33 +1,14 @@
 {% extends "admin/index.html" %}
 
 {% block content %}
-
-
-
     <div class="dashboard">
         <!-- Your custom admin dashboard content goes here -->
-        <li style="float: right;">
-            <a href="{% url 'bin_emptying_report' %}" class="button" target="_blank">Generate Bin Emptying Report</a>
-            <span style="margin-left: 10px;"></span> <!-- Add space between buttons -->
-            <a href="{% url 'driver_wise_bin_emptying_report' %}" class="button" target="_blank">Driver-wise Bin Emptying Report</a>
-            <span style="margin-left: 10px;"></span> <!-- Add space between buttons -->
-            <a href="{% url 'lodged_complaints_report' %}" class="button" target="_blank">Lodged Complaints Report</a>
-            <span style="margin-left: 10px;"></span> <!-- Add space between buttons -->
-            <a href="{% url 'driver_wise_complaint_report' %}" class="button" style="margin-right: 100px;" target="_blank">Driver-wise Complaints Report</a>    
-        </li>
-        
-        
-        <h2>Admin Dashboard</h2>
-        <ul>
-            <li>New Complaints: {{ new_complaints }}</li>
-            <li>Assigned Complaints: {{ assigned_complaints }}</li>
-            <li>Rejected Complaints: {{ rejected_complaints }}</li>
-            <li>Completed Complaints: {{ completed_complaints }}</li>
-            <li>Total Drivers: {{ total_drivers }}</li>
-            <li>Total Full Bins: {{ total_full_bins }}</li>
-            <li>Total Emptied Bins: {{ total_emptied_bins }}</li>
-        </ul>
+        <li style="float: right; margin-right: 20px;">           
+            <a href="{% url 'admin_dashboard' %}" class="button" style="margin-right: 100px;" target="_blank">View Admin Dashboard</a>    
+        </li>  
+        <div style="clear: both;"></div> <!-- Add a clearing div -->  
     </div>
+    <div style="margin-bottom: 20px;"></div> <!-- Add bottom margin -->
     {{ block.super }} 
 {% endblock %}
 

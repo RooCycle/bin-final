@@ -4,7 +4,7 @@ from .models import Complaint
 class ComplaintForm(forms.ModelForm):
     class Meta:
         model = Complaint
-        fields = '__all__'
+        exclude = ['user','assigned_to', 'status']
 
 class CSVUploadForm(forms.Form):
     csv_file = forms.FileField()
@@ -39,6 +39,12 @@ class ComplaintAdminForm(forms.ModelForm):
     class Meta:
         model = Complaint
         fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        drivers_group = Group.objects.get(name='Drivers')
+        self.fields['assigned_to'].queryset = drivers_group.user_set.all()
+
 
     def clean_assigned_to(self):
         assigned_to = self.cleaned_data.get('assigned_to')

@@ -73,4 +73,14 @@ class Bin(models.Model):
         return self.bin_number
     
 
+# models.py
+
+from django.db import models
+
+class ChartInReports(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    html_content = models.TextField()
+
+    def __str__(self):
+        return self.name
 

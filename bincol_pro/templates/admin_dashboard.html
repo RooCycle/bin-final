@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .dashboard {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            text-align: center; /* Center the content */
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px; /* Increase font size */
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+            font-size: 18px; /* Increase font size */
+        }
+        .button-container {
+            text-align: center; /* Center the buttons */
+            margin-bottom: 20px; /* Add bottom margin */
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px; /* Increase font size */
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="button-container">
+            <a href="{% url 'about_us' %}" class="button">About Us</a>
+            <a href="{% url 'contact_us' %}" class="button">Contact Us</a>
+            <a href="{% url 'logout' %}" class="button">Logout</a>
+        </div>
+        <h2>Admin Dashboard</h2>
+        <ul>
+            <li style="font-weight: bold; color: #b715bd; font-size: 24px;">New Complaints: {{ new_complaints }}</li>
+            <li style="font-weight: bold; color: #b715bd; font-size: 24px;">Assigned Complaints: {{ assigned_complaints }}</li>
+            <li style="font-weight: bold; color: #b715bd; font-size: 24px;">Rejected Complaints: {{ rejected_complaints }}</li>
+            <li style="font-weight: bold; color: #b715bd; font-size: 24px;">Completed Complaints: {{ completed_complaints }}</li>
+            <li style="font-weight: bold; color: #b715bd; font-size: 24px;">Total Drivers: {{ total_drivers }}</li>
+            <li style="font-weight: bold; color: #b715bd; font-size: 24px;">Total Full Bins: {{ total_full_bins }}</li>
+            <li style="font-weight: bold; color: #b715bd; font-size: 24px;">Total Emptied Bins: {{ total_emptied_bins }}</li>
+        </ul>
+
+        <div class="button-container">
+            <a href="{% url 'bin_emptying_report' %}" class="button" target="_blank">Generate Bin Emptying Report</a>
+            <a href="{% url 'driver_wise_bin_emptying_report' %}" class="button" target="_blank">Driver-wise Bin Emptying Report</a>
+            <a href="{% url 'lodged_complaints_report' %}" class="button" target="_blank">Lodged Complaints Report</a>
+            <div style="margin-bottom: 25px;"></div> <!-- Add bottom margin -->
+            <a href="{% url 'driver_wise_complaint_report' %}" class="button" target="_blank">Driver-wise Complaints Report</a>
+        </div>
+    </div>
+</body>
+</html>
