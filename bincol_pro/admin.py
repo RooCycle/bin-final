@@ -17,6 +17,22 @@ class ComplaintAdmin(admin.ModelAdmin):
     list_display = ['number', 'subject', 'assigned_to', 'status', 'created_at']
     search_fields = ['number']
 
+    def save_model(self, request, obj, form, change):
+        # Call the parent class's save_model method to save the complaint
+        super().save_model(request, obj, form, change)
+
+        # Check if a driver has been assigned to the complaint
+        if obj.assigned_to:
+            # Get the email of the assigned driver
+            driver_email = obj.assigned_to.email
+
+            # Craft the email subject and message
+            subject = 'Complaint Assignment Notification'
+            message = f'Hello {obj.assigned_to.username},\n\nYou have been assigned to handle complaint {obj.number} - {obj.subject}.\n\nRegards,\nThe Admin Team'
+
+            # Send the email
+            send_mail(subject, message, 'bincolwaste@gmail.com', [driver_email])
+
     def assign_complaint_to_user(self, request, queryset):
         # Get the "Drivers" group
         drivers_group = Group.objects.get(name='Drivers')
@@ -36,13 +52,33 @@ from django.urls import reverse
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import Bin
-
+from django.core.mail import send_mail
 
 class BinAdmin(admin.ModelAdmin):
     form = BinForm
     list_display = ('bin_number', 'location', 'capacity', 'status', 'assigned_driver')
-    #actions = ['add_bin', 'edit_bin', 'delete_bin']
     
+    def save_model(self, request, obj, form, change):
+        # Call the parent class's save_model method to save the bin
+        super().save_model(request, obj, form, change)
+
+        # Check if a driver has been assigned to the bin
+        if obj.assigned_driver:
+            # Get the email of the assigned driver
+            driver_email = obj.assigned_driver.email
+
+            # Craft the email subject and message
+            subject = 'Bin Assignment Notification'
+            message = f'Hello {obj.assigned_driver.username},\n\nYou have been assigned to manage bin {obj.bin_number} at {obj.location}.\n\nRegards,\nThe Admin Team'
+
+            # Send the email
+            send_mail(subject, message, 'bincolwaste@gmail.com', [driver_email])
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'assigned_driver':
+            # Filter the queryset to include only users in the Drivers group
+            kwargs["queryset"] = Group.objects.get(name='Drivers').user_set.all()
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def add_bin(self, request, queryset):
         # Redirect to the add bin view

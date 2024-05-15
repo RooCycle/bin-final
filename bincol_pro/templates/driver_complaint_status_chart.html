@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,27 @@
             color: #333;
             text-align: center;
             margin-bottom: 20px;
+        }
+
+        nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav button:hover {
+            background-color: #0056b3;
         }
 
         #chart-name-form {
@@ -80,35 +102,49 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
+
+        .image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .image-container img {
+            max-width: 200px;
+            height: auto;
+            margin: 10px;
+            border-radius: 10px;
+        }
     </style>
 </head>
+
 <body>
-    <h1>Complaint Status Distribution</h1>
+    <h1>Complaint Status Distribution Chart</h1>
+
+    <nav>
+        <button onclick="window.location.href='{% url 'home' %}'">Home</button>
+        <button onclick="window.location.href='{% url 'about_us' %}'">About Us</button>
+        <button onclick="window.location.href='{% url 'contact_us' %}'">Contact Us</button>
+        <button onclick="window.location.href='{% url 'logout' %}'">Logout</button>
+    </nav>
 
     <!-- Display success and error messages -->
     {% if messages %}
     <div class="messages">
         {% for message in messages %}
-            <p class="{% if message.tags %}{{ message.tags }}-message{% endif %}">{{ message }}</p>
+        <p class="{% if message.tags %}{{ message.tags }}-message{% endif %}">{{ message }}</p>
         {% endfor %}
     </div>
     {% endif %}
-
-    <!-- Display the form for chart name input -->
-    <div id="chart-name-form">
-        <form action="{% url 'save_chart' %}" method="post">
-            {% csrf_token %}
-            <label for="name">Enter a unique name for the chart:</label>
-            <input type="text" id="chart-name" name="name" required>
-            <!-- Hidden input field for the chart content -->
-            <input type="hidden" name="chart_div" value="{{ chart_div|safe }}">
-            <button type="submit">Save Chart</button>
-        </form>
-    </div>
 
     <!-- Display the pie chart -->
     <div id="complaint-status-chart">
         {{ chart_div|safe }}
     </div>
+
+    <div class="image-container">
+        <img src="/static/driver_chart_1.jpg" alt="Bin Image 1">
+        <img src="/static/driver_chart_2.jpg" alt="Bin Image 2">
+    </div>
 </body>
+
 </html>

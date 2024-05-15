@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,19 +20,71 @@
             margin-bottom: 20px;
         }
 
+        nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav button:hover {
+            background-color: #0056b3;
+        }
+
         #plot_div {
             margin: auto;
             width: 80%;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .image-container img {
+            max-width: 200px;
+            height: auto;
+            margin: 10px;
+            border-radius: 10px;
         }
     </style>
 </head>
+
 <body>
     <h1>Driver Bin Status Chart</h1>
+
+    <nav>
+        <button onclick="window.location.href='{% url 'home' %}'">Home</button>
+        <button onclick="window.location.href='{% url 'about_us' %}'">About Us</button>
+        <button onclick="window.location.href='{% url 'contact_us' %}'">Contact Us</button>
+        <button onclick="window.location.href='{% url 'logout' %}'">Logout</button>
+    </nav>
 
     <!-- Render the plot_div -->
     <div id="plot_div">
         {{ plot_div|safe }}
     </div>
 
+    <div class="image-container">
+        <img src="/static/driver_bin_chart_1.jpg" alt="Bin Image 1">
+        <img src="/static/driver_bin_chart_2.jpg" alt="Bin Image 1">
+        <img src="/static/driver_bin_chart_3.jpg" alt="Bin Image 1">
+        
+    </div>
 </body>
+
 </html>

@@ -17,7 +17,7 @@
         .container {
             max-width: 800px;
             margin: 20px auto;
-            padding: 0 20px;
+            padding: 20px;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
@@ -40,6 +40,7 @@
         }
         .button-container {
             margin-top: 30px;
+            text-align: center;
         }
         .button-container button {
             padding: 10px 20px;
@@ -55,23 +56,41 @@
         .button-container button:hover {
             background-color: #0056b3;
         }
+        .contact-info {
+            margin-top: 20px;
+        }
+        .contact-info p {
+            margin-bottom: 10px;
+        }
+        .contact-info img {
+            display: block;
+            margin: 0 auto;
+            max-width: 400px;
+            height: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="button-container">
             <button onclick="window.location.href='{% url 'home' %}'">Home</button>
             <button onclick="window.location.href='{% url 'about_us' %}'">About Us</button>
-            
             <button onclick="window.location.href='{% url 'login' %}'">Logout</button>
         </div>
         <h1>Contact Us</h1>
         <p style="text-align: center;">It's important to get in touch with us for any inquiries, feedback, or assistance you may need. We're here to help!</p>
-        <h2>{{ contact_page.title }}</h2>
-        <p><strong>Address:</strong> {{ contact_page.address }}</p>
-        <p><strong>Phone:</strong> {{ contact_page.phone }}</p>
-        <p><strong>Email:</strong> {{ contact_page.email }}</p>
+        <div class="contact-info">
+            <h2>{{ contact_page.title }}</h2>
+            <p><strong>Address:</strong> {{ contact_page.address }}</p>
+            <p><strong>Phone:</strong> {{ contact_page.phone }}</p>
+            <p><strong>Email:</strong> {{ contact_page.email }}</p>
+            <!-- Add images -->
+            <img src="\static\contact_us_1.jpg" alt="Contact Image 1">
+            <img src="\static\contact_us_2.jpg" alt="Contact Image 2">
+        </div>
     </div>
 </body>
 </html>

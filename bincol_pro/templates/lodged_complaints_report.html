@@ -11,6 +11,34 @@
             margin: 0;
             padding: 0;
         }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        h1, h2 {
+            margin: 0;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+            padding: 10px;
+        }
+        .nav-buttons button {
+            margin: 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        .nav-buttons button:hover {
+            background-color: #0056b3;
+        }
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -19,15 +47,12 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        h1, h2 {
-            color: #333;
-            text-align: center;
-        }
         form {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
         label {
             margin-right: 10px;
@@ -36,6 +61,7 @@
             padding: 5px;
             border-radius: 4px;
             border: 1px solid #ccc;
+            margin-bottom: 10px;
         }
         button[type="submit"] {
             padding: 8px 20px;
@@ -58,7 +84,8 @@
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff;
+            color: #fff;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
@@ -70,13 +97,34 @@
             text-align: center;
             color: #777;
         }
+        .content {
+            text-align: center;
+        }
+        .image-gallery {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .image-gallery img {
+            max-width: 200px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="header">
         <h1>Lodged Complaints Report</h1>
-
-        <!-- Complaint Search Form -->
+    </div>
+    <div class="nav-buttons">
+        <button onclick="location.href='{% url 'home' %}'">Home</button>
+        <button onclick="location.href='/about-us/'">About Us</button>
+        <button onclick="location.href='/contact-us/'">Contact Us</button>
+        <button onclick="location.href='{% url 'log_out' %}'">Logout</button>
+    </div>
+    <div class="container">
         <form method="post" onsubmit="return validateForm()">
             {% csrf_token %}
             <label for="start_date">Start Date:</label>
@@ -86,8 +134,7 @@
             <button type="submit">Generate Report</button>
         </form>
 
-        <!-- Display Report Results -->
-        <div>
+        <div class="content">
             {% if complaints %}
                 <h2>Report Results:</h2>
                 <table>
@@ -108,7 +155,7 @@
                                 <td>{{ complaint.subject }}</td>
                                 <td>{{ complaint.description }}</td>
                                 <td>{{ complaint.status }}</td>
-                                <td>{{ complaint.assigned_to}}</td>
+                                <td>{{ complaint.assigned_to }}</td>
                                 <td>{{ complaint.created_at }}</td>
                             </tr>
                         {% endfor %}
@@ -118,6 +165,12 @@
                 <p class="empty-message">No complaints found within the specified date range.</p>
             {% endif %}
         </div>
+    </div>
+
+    <div class="image-gallery">
+        <img src="/static/admin_comp_1.jpg" alt="Complaint Image 1">
+        <img src="/static/admin_comp_2.jpg" alt="Complaint Image 2">
+        <img src="/static/admin_comp_3.jpg" alt="Complaint Image 3">
     </div>
 
     <script>

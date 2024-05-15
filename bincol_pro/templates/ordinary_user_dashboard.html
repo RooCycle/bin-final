@@ -26,6 +26,11 @@
             color: #333;
         }
 
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
         .button-container {
             margin-top: 20px;
         }
@@ -42,6 +47,22 @@
 
         button:hover {
             background-color: #0056b3;
+        }
+
+        .about-images {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .about-images img {
+            max-width: 400px;
+            margin: 0 20px;
+        }
+        p {
+            color: black; /* Changed color to black */
+            font-weight: bold; /* Added bold font weight */
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -60,6 +81,19 @@
             <button onclick="window.location.href='{% url 'lodge_complaint' %}'">Lodge a Complaint</button>
             <button onclick="window.location.href='{% url 'complaint_history' %}'">Complaints History</button>
         </div>
+
+        
+        
+        <div class="about-images">
+            <img src="\static\alfonso-navarro-qph7tJfcDys-unsplash.jpg" alt="BINCOL Logo">
+            <img src="\static\rivage-aI4RJ--Mw4I-unsplash.jpg" alt="Waste Management">
+        </div>
+
+        <p>If you have any issues or concerns, you can lodge a complaint by clicking on the "Lodge a Complaint" button. We are here to address your concerns promptly.</p>
+        
+        <p>If you want to view the complaints you have previously lodged, click on the "Complaints History" button. This allows you to keep track of the status and resolution of your complaints.</p>
+
+        <p>Thank you for your cooperation in helping us improve our services!</p>
     </div>
 </body>
 </html>

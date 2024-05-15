@@ -12,7 +12,7 @@
             background-color: #f4f4f4;
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 50px auto;
             padding: 20px;
             background-color: #fff;
@@ -21,6 +21,11 @@
         }
         h2 {
             color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        p {
+            color: #666;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -54,16 +59,73 @@
         button[type="submit"]:hover {
             background-color: #0056b3;
         }
+        .message {
+            font-weight: bold;
+            color: green;
+        }
+        .button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            text-decoration: none;
+            color: #333;
+            margin: 0 10px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+        .about-images {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .about-images img {
+            max-width: 300px;
+            margin: 0 20px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="button-container">
+            <button onclick="window.location.href='{% url 'home' %}'">Home</button>
+            <button onclick="window.location.href='{% url 'about_us' %}'">About Us</button>
+            <button onclick="window.location.href='{% url 'contact_us' %}'">Contact Us</button>
+            <button onclick="window.location.href='{% url 'log_out' %}'">Logout</button>
+        </div>
         <h2>Lodge a Complaint</h2>
+        <p>Lodging a complaint helps us improve our services. Your feedback is valuable to us!</p>
+        {% if messages %}
+            <div>
+                {% for message in messages %}
+                    <p class="message">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Submit</button>
         </form>
+        <div class="about-images">
+            <img src="\static\lodge_1.jpg" alt="Importance of Complaints">
+            <img src="\static\lodge_2.jpg" alt="Customer Feedback">
+        </div>
+        <div class="button-container">
+            <button onclick="window.location.href='{% url 'complaint_history' %}'">View Complaints History</button>
+        </div>
     </div>
 </body>
 </html>

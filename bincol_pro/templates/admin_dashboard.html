@@ -49,15 +49,34 @@
         .button:hover {
             background-color: #0056b3;
         }
+        /* New styles for images */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            max-width: 65%;
+            height: auto;
+        }
+        h2 {
+        color: #007bff; /* Light blue color */
+        }
+
     </style>
 </head>
 <body>
     <div class="dashboard">
+        <!-- Logo container with image -->
         <div class="button-container">
+            <a href="{% url 'home' %}" class="button">Home</a>
             <a href="{% url 'about_us' %}" class="button">About Us</a>
             <a href="{% url 'contact_us' %}" class="button">Contact Us</a>
             <a href="{% url 'logout' %}" class="button">Logout</a>
         </div>
+        <div class="logo-container">
+            <img src="\static\admin 1.jpg" alt="Logo">
+        </div>
+
         <h2>Admin Dashboard</h2>
         <ul>
             <li style="font-weight: bold; color: #b715bd; font-size: 24px;">New Complaints: {{ new_complaints }}</li>
@@ -75,6 +94,11 @@
             <a href="{% url 'lodged_complaints_report' %}" class="button" target="_blank">Lodged Complaints Report</a>
             <div style="margin-bottom: 25px;"></div> <!-- Add bottom margin -->
             <a href="{% url 'driver_wise_complaint_report' %}" class="button" target="_blank">Driver-wise Complaints Report</a>
+        </div>
+
+        <!-- Another image container -->
+        <div class="logo-container">
+            <img src="\static\admin 2.jpg" alt="Image">
         </div>
     </div>
 </body>

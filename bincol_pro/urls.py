@@ -48,4 +48,5 @@ urlpatterns = [
     path('driver-bin-chart/', views.driver_bin_status_chart, name='driver_bin_chart'),
     path('admin_dashboard', views.admin_dashboard, name='admin_dashboard'),
     path('save_chart/', views.save_chart, name='save_chart'),
+    path('admin/', views.admin_home_redirect, name='admin_home_redirect'),
 ]

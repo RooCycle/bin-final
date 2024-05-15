@@ -38,6 +38,7 @@
             padding: 5px;
             border-radius: 4px;
             border: 1px solid #ccc;
+            margin-right: 10px;
         }
         button[type="submit"] {
             padding: 8px 20px;
@@ -46,6 +47,7 @@
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         button[type="submit"]:hover {
             background-color: #0056b3;
@@ -77,52 +79,121 @@
             text-align: center;
             color: #777;
         }
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            background-color: #333;
+            padding: 10px;
+        }
+        .nav-buttons button {
+            margin: 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        .nav-buttons button:hover {
+            background-color: #0056b3;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            width: 200px;
+            height: 100%;
+            background-color: #333;
+            padding: 20px;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .sidebar img {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .left-sidebar {
+            left: 0;
+        }
+        .right-sidebar {
+            right: 0;
+        }
+        .content {
+            flex: 1;
+            margin-left: 220px;
+            margin-right: 220px;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Bin Emptying Report</h1>
-        <form method="post" onsubmit="return validateForm()">
-            {% csrf_token %}
-            <label for="start_date">Start Date:</label>
-            <input type="date" id="start_date" name="start_date">
-            <label for="end_date">End Date:</label>
-            <input type="date" id="end_date" name="end_date">
-            <button type="submit">Generate Report</button>
-        </form>
-
-        {% if start_date and end_date %}
-            <h2>Report for {{ start_date }} to {{ end_date }}</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Bin Number</th>
-                        <th>Location</th>
-                        <th>Capacity</th>
-                        <th>Status</th>
-                        <th>Assigned Driver</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for bin in emptied_bins %}
-                    <tr>
-                        <td>{{ bin.bin_number }}</td>
-                        <td>{{ bin.get_location_display }}</td>
-                        <td>{{ bin.get_capacity_display }}</td>
-                        <td>{{ bin.status }}</td>
-                        <td>{{ bin.assigned_driver }}</td>
-                        <td>{{ bin.created_at }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="6" class="empty-message">No bins emptied within the specified date range.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
+    <div class="sidebar left-sidebar">
+        <img src="/static/driver_sidebar.jpg" alt="Sidebar Image">
     </div>
+
+    <div class="content">
+        <div class="nav-buttons">
+            <button onclick="location.href='{% url 'home' %}'">Home</button>
+            <button onclick="location.href='/about-us/'">About Us</button>
+            <button onclick="location.href='/contact-us/'">Contact Us</button>
+            <button onclick="location.href='{% url 'log_out' %}'">Logout</button>
+        </div>
+
+        <div class="container">
+            <h1>Bin Emptying Report</h1>
+            <form method="post" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date" name="start_date">
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date" name="end_date">
+                <button type="submit">Generate Report</button>
+            </form>
+
+            {% if start_date and end_date %}
+                <h2>Report for {{ start_date }} to {{ end_date }}</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bin Number</th>
+                            <th>Location</th>
+                            <th>Capacity</th>
+                            <th>Status</th>
+                            <th>Assigned Driver</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bin in emptied_bins %}
+                        <tr>
+                            <td>{{ bin.bin_number }}</td>
+                            <td>{{ bin.get_location_display }}</td>
+                            <td>{{ bin.get_capacity_display }}</td>
+                            <td>{{ bin.status }}</td>
+                            <td>{{ bin.assigned_driver }}</td>
+                            <td>{{ bin.created_at }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty-message">No bins emptied within the specified date range.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="sidebar right-sidebar">
+        <img src="/static/admin_bin_1.jpg" alt="Bin Image 1">
+        <img src="/static/admin_bin_2.jpg" alt="Bin Image 2">
+        <img src="/static/admin_bin_3.jpg" alt="Bin Image 3">
+    </div>
+
     <script>
         function validateForm() {
             var startDate = document.getElementById("start_date").value;

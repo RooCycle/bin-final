@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,9 +13,35 @@
             background-color: #f4f4f4;
         }
 
-        h1 {
+        header {
             text-align: center;
             margin-bottom: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        nav {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav button:hover {
+            background-color: #0056b3;
         }
 
         form {
@@ -34,7 +61,7 @@
             margin-right: 10px;
         }
 
-        button {
+        button[type="submit"] {
             padding: 8px 16px;
             background-color: #007bff;
             color: #fff;
@@ -43,7 +70,7 @@
             cursor: pointer;
         }
 
-        button:hover {
+        button[type="submit"]:hover {
             background-color: #0056b3;
         }
 
@@ -53,7 +80,8 @@
             margin-top: 20px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
@@ -66,10 +94,32 @@
         tbody tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
+        .image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .image-container img {
+            max-width: 300px;
+            height: auto;
+            margin: 10px;
+            border-radius: 10px;
+        }
     </style>
 </head>
+
 <body>
-    <h1>Collected Bin Report</h1>
+    <header>
+        <h1>Collected Bin Report</h1>
+    </header>
+
+    <nav>
+        <button onclick="window.location.href='{% url 'home' %}'">Home</button>
+        <button onclick="window.location.href='{% url 'about_us' %}'">About Us</button>
+        <button onclick="window.location.href='{% url 'contact_us' %}'">Contact Us</button>
+        <button onclick="window.location.href='{% url 'logout' %}'">Logout</button>
+    </nav>
 
     <form method="post" onsubmit="return validateForm()">
         {% csrf_token %}
@@ -98,6 +148,12 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <div class="image-container">
+        <img src="\static\bin_report_1.jpg" alt="Bin Image 1">
+        <img src="\static\bin_report_2.jpg" alt="Bin Image 2">
+    </div>
+
     <script>
         function validateForm() {
             var startDate = document.getElementById("start_date").value;
@@ -111,4 +167,5 @@
         }
     </script>
 </body>
+
 </html>

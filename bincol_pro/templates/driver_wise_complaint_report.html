@@ -12,9 +12,33 @@
             padding: 0;
             box-sizing: border-box;
         }
-        h1 {
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 0;
             text-align: center;
-            margin-top: 20px;
+        }
+        h1 {
+            margin: 20px 0;
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            background-color: #333;
+            padding: 10px;
+        }
+        .nav-buttons button {
+            margin: 5px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        .nav-buttons button:hover {
+            background-color: #0056b3;
         }
         form {
             max-width: 500px;
@@ -55,14 +79,37 @@
         li {
             margin-bottom: 10px;
         }
-        p {
+        .empty-message {
             text-align: center;
             color: #777;
+        }
+        .content {
+            text-align: center;
+        }
+        .image-gallery {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .image-gallery img {
+            max-width: 200px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
-    <h1>Driver-wise Complaint Report</h1>
+    <div class="header">
+        <h1>Driver-wise Complaint Report</h1>
+    </div>
+    <div class="nav-buttons">
+        <button onclick="location.href='{% url 'home' %}'">Home</button>
+        <button onclick="location.href='/about-us/'">About Us</button>
+        <button onclick="location.href='/contact-us/'">Contact Us</button>
+        <button onclick="location.href='{% url 'log_out' %}'">Logout</button>
+    </div>
     <form method="post" onsubmit="return validateForm()">
         {% csrf_token %}
         <label for="driver_id">Select Driver:</label>
@@ -81,17 +128,24 @@
         <button type="submit">Generate Report</button>
     </form>
 
-    <!-- Display report results -->
-    {% if complaints %}
-        <h2>Complaints:</h2>
-        <ul>
-            {% for complaint in complaints %}
-                <li>{{ complaint.number }} - {{ complaint.subject }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No complaints found for the selected driver and date range.</p>
-    {% endif %}
+    <div class="content">
+        {% if complaints %}
+            <h2>Complaints:</h2>
+            <ul>
+                {% for complaint in complaints %}
+                    <li>{{ complaint.number }} - {{ complaint.subject }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="empty-message">No complaints found for the selected driver and date range.</p>
+        {% endif %}
+    </div>
+
+    <div class="image-gallery">
+        <img src="/static/admin_comp_4.jpg" alt="Complaint Image 1">
+        <img src="/static/admin_comp_5.jpg" alt="Complaint Image 2">
+        <img src="/static/admin_comp_6.jpg" alt="Complaint Image 3">
+    </div>
 
     <script>
         function validateForm() {

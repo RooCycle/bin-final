@@ -49,6 +49,11 @@ def signup(request):
 
     return render(request, 'signup.html')
 
+
+
+from django.core.mail import send_mail
+from django.conf import settings
+
 def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
@@ -59,21 +64,19 @@ def activate(request, uidb64, token):
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
         user.save()
+
+        # Replace 'admin@example.com' with the actual email address of your admin
+        admin_email = 'iandan_bincol@outlook.com'  
+        subject = 'User Activation Notification'
+        message = f'The user {user.username} has been successfully activated. Please assign them a role'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        send_mail(subject, message, from_email, [admin_email])
+
         return render(request, 'login.html', {'message': 'Registration successful. Please log in.'})
     else:
         return render(request, 'activation_invalid.html')
 
-"""def user_login(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None and user.is_active:
-            auth_login(request, user)
-            return redirect('home')
-        else:
-            return render(request, 'login.html', {'error_message': 'Invalid login'})
-    return render(request, 'login.html')"""
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -95,28 +98,11 @@ def user_login(request):
 def home(request):
     return render(request, 'home.html')
 
-#def profile_create(request):
-    # We will add logic for creating profile here
-    #return render(request, 'profile_create.html')
-
-"""def profile_create(request, username): 
-    return render(request, 'profile_create.html', {'username': username})"""
 
 @login_required
 def dashboard(request):
     return render(request, 'dashboard.html', {'username': request.user.username})
 
-"""@login_required
-def change_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Update session to prevent logout
-            return redirect('dashboard')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {'form': form})"""
 
 @login_required
 def change_password(request):
@@ -155,7 +141,7 @@ from .forms import ComplaintForm
 from django.contrib.auth.decorators import login_required
 from .forms import ComplaintForm
 
-@login_required
+"""@login_required
 def lodge_complaint(request):
     if request.method == 'POST':
         form = ComplaintForm(request.POST)
@@ -166,18 +152,32 @@ def lodge_complaint(request):
             return redirect('complaint_history')
     else:
         form = ComplaintForm()
-    return render(request, 'lodge_complaint.html', {'form': form})
-
-"""def lodge_complaint(request):
+    return render(request, 'lodge_complaint.html', {'form': form})"""
+@login_required
+def lodge_complaint(request):
     if request.method == 'POST':
         form = ComplaintForm(request.POST)
         if form.is_valid():
-            form.save()
-            # Optionally, you can redirect to a success page or perform other actions
-            return redirect('complaint_history')  # Replace 'success_page' with the name of your success page URL
+            # Save the complaint
+            # Associate the complaint with the currently logged-in user
+            complaint = form.save(commit=False)
+            complaint.user = request.user  # Assuming user field in the Complaint model is named 'user'
+            complaint.save()
+
+            # Notify the admin via email
+            admin_email = 'iandan_bincol@outlook.com'  # Replace with your admin's email
+            subject = 'New Complaint Lodged'
+            message = f'A new complaint with number {complaint.number} has been lodged. Please assign it to a driver.'
+            send_mail(subject, message, 'bincolwaste@gmail.com', [admin_email])
+
+            # Display success message
+            messages.success(request, 'Complaint lodged successfully. Admin has been notified.')
+            return redirect('lodge_complaint')  # Redirect to the homepage
     else:
         form = ComplaintForm()
-    return render(request, 'lodge_complaint.html', {'form': form})"""
+
+    return render(request, 'lodge_complaint.html', {'form': form})
+
 
 from django.shortcuts import render
 from .models import Complaint
@@ -320,6 +320,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
+
 @login_required
 def driver_dashboard(request):
     if request.user.groups.filter(name='Drivers').exists():
@@ -332,13 +334,10 @@ def driver_dashboard(request):
         total_bins_emptied = Bin.objects.filter(assigned_driver=request.user, status='Emptied').count()
 
         # Pagination for assigned bins
-        # Pagination for assigned bins
         bin_page_number = request.GET.get('bin_page')
         bin_paginator = Paginator(assigned_bins, 5)  # Show 5 bins per page
         assigned_bins_page = bin_paginator.get_page(bin_page_number)
 
-        # Pagination for assigned complaints
-        # Pagination for assigned complaints
         # Pagination for assigned complaints
         complaint_page_number = request.GET.get('complaint_page')
         complaint_paginator = Paginator(assigned_complaints, 5)  # Show 5 complaints per page
@@ -356,8 +355,29 @@ def driver_dashboard(request):
             elif 'complaint_number' in request.POST:
                 complaint_id = request.POST.get('complaint_number')
                 new_complaint_status = request.POST.get('new_status')
-                #complaint_instance = Complaint.objects.get(pk=complaint_id)
                 complaint_instance = get_object_or_404(Complaint, pk=complaint_id)
+
+                # Check if the status is being updated to "Resolved"
+                # Check if the status is being updated to "Resolved"
+                # Check if the status is being updated to "Resolved"
+                if new_complaint_status == 'Resolved':
+                    # Get the user who lodged the complaint
+                    user = complaint_instance.user
+                    # Send an email notification to the user
+                    subject = 'Complaint Resolved Notification'
+                    message_user = f"Your complaint with number {complaint_instance.number} has been resolved."
+                    from_email = settings.DEFAULT_FROM_EMAIL
+                    to_email_user = user.email
+                    send_mail(subject, message_user, from_email, [to_email_user])
+
+                    # Send an email notification to the admin
+                    admin_email = 'iandan_bincol@outlook.com'  # Replace with the admin's email address
+                    admin_user = User.objects.get(username='admin')  # Assuming the admin username is 'admin'
+                    message_admin = f"A complaint with number {complaint_instance.number} has been resolved."
+                    to_email_admin = admin_email if admin_email else admin_user.email
+                    send_mail(subject, message_admin, from_email, [to_email_admin])
+
+                # Update the complaint status
                 complaint_instance.status = new_complaint_status
                 complaint_instance.save()
                 messages.success(request, "Complaint status updated successfully")
@@ -681,6 +701,10 @@ def save_chart(request):
         pass
 
 
+from django.shortcuts import redirect
+
+def admin_home_redirect(request):
+    return redirect('home')  # Assuming 'home' is the name of the URL pattern for your custom home page
 
 
 

@@ -12,6 +12,11 @@
             background-color: #f4f4f4;
         }
 
+        .container {
+            max-width: 800px;
+            margin: 0 auto; /* Center the container horizontally */
+        }
+
         h1 {
             color: #333;
             text-align: center;
@@ -66,43 +71,86 @@
         li {
             margin-bottom: 8px;
         }
+
+        /* Additional styling */
+        .button-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .button-container a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .button-container a:hover {
+            background-color: #0056b3;
+        }
+
+        /* Image styling */
+        .image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Lodged Complaint Report</h1>
-    <form method="POST" onsubmit="return validateForm()">
-        {% csrf_token %}
-        <label for="start_date">Start Date:</label>
-        <input type="date" id="start_date" name="start_date">
-        <label for="end_date">End Date:</label>
-        <input type="date" id="end_date" name="end_date">
-        <button type="submit">Generate Report</button>
-    </form>
-    
-    {% if start_date and end_date %}
-        <p>Date Range: {{ start_date }} to {{ end_date }}</p>
+    <div class="container">
+        <div class="button-container">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'about_us' %}">About Us</a>
+            <a href="{% url 'contact_us' %}">Contact Us</a>
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
 
-        <h2>Assigned Complaints</h2>
-        <ul>
-            {% for complaint in assigned_complaints %}
-                <li>{{ complaint.subject }} - {{ complaint.status }}</li>
-            {% endfor %}
-        </ul>
+        <h1>Lodged Complaint Report</h1>
+        <p>Please select two dates between which you would like to view lodged complaints assigned to you.</p>
+        
+        <form method="POST" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date">
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date">
+            <button type="submit">Generate Report</button>
+        </form>
+        
+        <div class="image-container">
+            
+            <img src="\static\driver lodged 2.jpg" alt="Image 2">
+        </div>
+        
+        {% if start_date and end_date %}
+            <div class="results">
+                <p>Date Range: {{ start_date }} to {{ end_date }}</p>
 
-        <h2>Resolved Complaints</h2>
-        <ul>
-            {% for complaint in resolved_complaints %}
-                <li>{{ complaint.subject }} - {{ complaint.status }}</li>
-            {% endfor %}
-        </ul>
+                <h2>Assigned Complaints</h2>
+                <ul>
+                    {% for complaint in assigned_complaints %}
+                        <li>{{ complaint.subject }} - {{ complaint.status }}</li>
+                    {% endfor %}
+                </ul>
 
-        <h2>Pending Complaints</h2>
-        <ul>
-            {% for complaint in pending_complaints %}
-                <li>{{ complaint.subject }} - {{ complaint.status }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+                <h2>Resolved Complaints</h2>
+                <ul>
+                    {% for complaint in resolved_complaints %}
+                        <li>{{ complaint.subject }} - {{ complaint.status }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h2>Pending Complaints</h2>
+                <ul>
+                    {% for complaint in pending_complaints %}
+                        <li>{{ complaint.subject }} - {{ complaint.status }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
 
     <script>
         function validateForm() {

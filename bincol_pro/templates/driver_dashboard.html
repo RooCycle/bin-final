@@ -8,8 +8,9 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f4f4f4;
+            display: flex;
         }
 
         h1, h2 {
@@ -42,6 +43,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         button:hover {
@@ -55,6 +57,7 @@
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             padding: 20px;
+            margin-top: 20px;
         }
 
         .section {
@@ -62,240 +65,255 @@
         }
 
         .report-button {
-            position: absolute;
-            top: 80px;
-            right: 20px;
             text-decoration: none;
             background-color: #007bff;
             color: #fff;
             padding: 10px 20px;
             border-radius: 5px;
+            display: inline-block;
+            text-align: center;
+            margin: 5px;
         }
+
         .nav-buttons {
-            margin-bottom: 20px;
             display: flex;
             justify-content: center;
-            
+            flex-wrap: wrap;
+            background-color: #333;
+            padding: 10px;
         }
 
         .nav-buttons button {
-            margin-right: 10px;
+            margin: 5px;
             background-color: #007bff;
             color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            padding: 5px 10px;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
         }
 
         .nav-buttons button:hover {
             background-color: #0056b3;
         }
+
         .messages {
-        color: green; /* Set color to green */
-        font-weight: bold; /* Optional: Make the message text bold */
-        display: flex; /* Use flexbox */
-        justify-content: center; /* Center horizontally */
-        align-items: center; /* Center vertically */
-        height: 20vh; /* Set height to full viewport height */
-}
+            color: green;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
         .sidebar {
             position: fixed;
-            left: 0;
             top: 0;
             width: 200px;
             height: 100%;
             background-color: #333;
             padding: 20px;
             color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .sidebar img {
             width: 100%;
             margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .left-sidebar {
+            left: 0;
+        }
+
+        .right-sidebar {
+            right: 0;
         }
 
         .content {
+            flex: 1;
             margin-left: 220px;
+            margin-right: 220px;
+            padding: 20px;
         }
-
-        
     </style>
 </head>
-<div class="sidebar">
-    <img src="/static/driver_sidebar.jpg" alt="Sidebar Image">
-</div>
-<div class="nav-buttons">
-    <button onclick="location.href='{% url 'home' %}'">Home</button>
-    <button onclick="location.href='/about-us/'">About Us</button>
-    <button onclick="location.href='/contact-us/'">Contact Us</button>
-    <button onclick="location.href={% url 'log_out' %}">Logout</a>
-</div>
 <body>
-    
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li class="messages">{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    <div class="sidebar left-sidebar">
+        <img src="/static/driver_sidebar.jpg" alt="Sidebar Image">
+    </div>
 
-    <div class="container">
-        <h1>Welcome, {{ username }}! You are a Driver</h1>
+    <div class="content">
+        <div class="nav-buttons">
+            <button onclick="location.href='{% url 'home' %}'">Home</button>
+            <button onclick="location.href='/about-us/'">About Us</button>
+            <button onclick="location.href='/contact-us/'">Contact Us</button>
+            <button onclick="location.href='{% url 'log_out' %}'">Logout</button>
+            <a href="{% url 'bin_report' %}" class="report-button">My Collected Bin Report</a>
+            <a href="{% url 'lodged_complaint_report' %}" class="report-button">My Lodged Complaints Report</a>
+            <a href="{% url 'driver_complaint_chart' %}" class="report-button">Complaints Distribution Chart</a>
+            <a href="{% url 'driver_bin_chart' %}" class="report-button">Bin Distribution Chart</a>
+        </div>
 
-        <div class="section">
-            <h2>Assigned Complaints</h2>
-            {% if assigned_complaints %}
+        {% if messages %}
+        <div class="messages">
             <ul>
-                {% for complaint in assigned_complaints %}
-                <li>
-                    Complaint No: {{ complaint.number }} - {{ complaint.subject }}
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <input type="hidden" name="complaint_number" value="{{ complaint.number }}">
-                        <select name="new_status">
-                            <option value="Pending" {% if complaint.status == 'Pending' %} selected {% endif %}>Pending</option>
-                            <option value="In Progress" {% if complaint.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                            <option value="Resolved" {% if complaint.status == 'Resolved' %} selected {% endif %}>Resolved</option>
-                        </select>
-                        <button type="submit">Update</button>
-                    </form>
-                </li>
+                {% for message in messages %}
+                <li>{{ message }}</li>
                 {% endfor %}
             </ul>
-            <nav aria-label="Complaint Navigation">
-                <ul class="pagination">
-                    {% if assigned_complaints_page.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.previous_page_number }}">Previous</a></li>
-                    {% endif %}
-                    <li class="page-item active"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.number }}">{{ assigned_complaints_page.number }}</a></li>
-                    {% if assigned_complaints_page.has_next %}
-                    <li class="page-item"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.next_page_number }}">Next</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-            
+        </div>
+        {% endif %}
+
+        <div class="container">
+            <h1>Welcome, {{ username }}! You are a Driver</h1>
+
             <div class="section">
-                <h2>Search Assigned Complaints</h2>
-                <form method="GET">
-                    <input type="text" name="complaint_number" placeholder="Enter Complaint Number">
-                    <button type="submit">Search</button>
-                </form>
-                <!-- Display search results -->
+                <h2>Assigned Complaints</h2>
                 {% if assigned_complaints %}
                 <ul>
                     {% for complaint in assigned_complaints %}
+                    <li>
+                        Complaint No: {{ complaint.number }} - {{ complaint.subject }}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="complaint_number" value="{{ complaint.number }}">
+                            <select name="new_status">
+                                <option value="Pending" {% if complaint.status == 'Pending' %} selected {% endif %}>Pending</option>
+                                <option value="In Progress" {% if complaint.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                <option value="Resolved" {% if complaint.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <nav aria-label="Complaint Navigation">
+                    <ul class="pagination">
+                        {% if assigned_complaints_page.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.previous_page_number }}">Previous</a></li>
+                        {% endif %}
+                        <li class="page-item active"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.number }}">{{ assigned_complaints_page.number }}</a></li>
+                        {% if assigned_complaints_page.has_next %}
+                        <li class="page-item"><a class="page-link" href="?complaint_page={{ assigned_complaints_page.next_page_number }}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+
+                <div class="section">
+                    <h2>Search Assigned Complaints</h2>
+                    <form method="GET">
+                        <input type="text" name="complaint_number" placeholder="Enter Complaint Number">
+                        <button type="submit">Search</button>
+                    </form>
+                    <!-- Display search results -->
+                    {% if assigned_complaints %}
+                    <ul>
+                        {% for complaint in assigned_complaints %}
+                        <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No assigned complaints found.</p>
+                    {% endif %}
+                </div>
+                {% else %}
+                <p>No assigned complaints.</p>
+                {% endif %}
+            </div>
+
+            <div class="section">
+                <h2>In Progress Complaints</h2>
+                {% if in_progress_complaints %}
+                <ul>
+                    {% for complaint in in_progress_complaints %}
                     <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
                     {% endfor %}
                 </ul>
-                
                 {% else %}
-                <p>No assigned complaints found.</p>
+                <p>No complaints in progress.</p>
                 {% endif %}
-                
             </div>
-            
-            {% else %}
-            <p>No assigned complaints.</p>
-            {% endif %}
-        </div>
 
-        <div class="section">
-            <h2>In Progress Complaints</h2>
-            {% if in_progress_complaints %}
-            <ul>
-                {% for complaint in in_progress_complaints %}
-                <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p>No complaints in progress.</p>
-            {% endif %}
-        </div>
-
-        <div class="section">
-            <h2>Resolved Complaints</h2>
-            {% if resolved_complaints %}
-            <ul>
-                {% for complaint in resolved_complaints %}
-                <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p>No resolved complaints.</p>
-            {% endif %}
-        </div>
-        
-        <div class="section">
-            <h2>Assigned Bins</h2>
-            {% if assigned_bins %}
-            <ul>
-                {% for bin in assigned_bins %}
-                <li>
-                    Bin ID: {{ bin.id }} - Bin Number: {{ bin.bin_number }}
-                    <form method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="bin_id" value="{{ bin.id }}">
-                        <select name="new_status">
-                            <option value="Filled" {% if bin.status == 'Filled' %} selected {% endif %}>Filled</option>
-                            <option value="Emptied" {% if bin.status == 'Emptied' %} selected {% endif %}>Emptied</option>
-                        </select>
-                        <button type="submit">Update</button>
-                    </form>
-                </li>
-                {% endfor %}
-            </ul>
-            
-            <nav aria-label="Bin Navigation">
-                <ul class="pagination">
-                    {% if assigned_bins_page.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?bin_page={{ assigned_bins_page.previous_page_number }}">Previous</a></li>
-                    {% endif %}
-                    <li class="page-item active"><a class="page-link" href="?bin_page={{ assigned_bins_page.number }}">{{ assigned_bins_page.number }}</a></li>
-                    {% if assigned_bins_page.has_next %}
-                    <li class="page-item"><a class="page-link" href="?bin_page={{ assigned_bins_page.next_page_number }}">Next</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-            
-            {% else %}
-            <p>No assigned bins.</p>
-            {% endif %}
             <div class="section">
-                <h2>Search Assigned Bins</h2>
-                <form method="GET">
-                    <input type="text" name="bin_id" placeholder="Enter Bin ID">
-                    <button type="submit">Search</button>
-                </form>
-                <!-- Display search results -->
-                {% if assigned_bins %}
+                <h2>Resolved Complaints</h2>
+                {% if resolved_complaints %}
                 <ul>
-                    {% for bin in assigned_bins %}
-                    <li>Bin ID: {{ bin.id }} - Bin Number: {{ bin.bin_number }}</li>
+                    {% for complaint in resolved_complaints %}
+                    <li>Complaint No: {{ complaint.number }} - {{ complaint.subject }}</li>
                     {% endfor %}
                 </ul>
                 {% else %}
-                <p>No assigned bins found.</p>
+                <p>No resolved complaints.</p>
                 {% endif %}
             </div>
-        </div>
 
-        <p>Total Bins Emptied: {{ total_bins_emptied }}</p>
+            <div class="section">
+                <h2>Assigned Bins</h2>
+                {% if assigned_bins %}
+                <ul>
+                    {% for bin in assigned_bins %}
+                    <li>
+                        Bin ID: {{ bin.id }} - Bin Number: {{ bin.bin_number }}
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="bin_id" value="{{ bin.id }}">
+                            <select name="new_status">
+                                <option value="Filled" {% if bin.status == 'Filled' %} selected {% endif %}>Filled</option>
+                                <option value="Emptied" {% if bin.status == 'Emptied' %} selected {% endif %}>Emptied</option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <nav aria-label="Bin Navigation">
+                    <ul class="pagination">
+                        {% if assigned_bins_page.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?bin_page={{ assigned_bins_page.previous_page_number }}">Previous</a></li>
+                        {% endif %}
+                        {% for i in assigned_bins_page.paginator.page_range %}
+                        <li class="page-item {% if assigned_bins_page.number == i %}active{% endif %}">
+                            <a class="page-link" href="?bin_page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if assigned_bins_page.has_next %}
+                        <li class="page-item"><a class="page-link" href="?bin_page={{ assigned_bins_page.next_page_number }}">Next</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% else %}
+                <p>No assigned bins.</p>
+                {% endif %}
+                <div class="section">
+                    <h2>Search Assigned Bins</h2>
+                    <form method="GET">
+                        <input type="text" name="bin_id" placeholder="Enter Bin ID">
+                        <button type="submit">Search</button>
+                    </form>
+                    <!-- Display search results -->
+                    {% if assigned_bins %}
+                    <ul>
+                        {% for bin in assigned_bins %}
+                        <li>Bin ID: {{ bin.id }} - Bin Number: {{ bin.bin_number }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p>No assigned bins found.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <p>Total Bins Emptied: {{ total_bins_emptied }}</p>
+        </div>
     </div>
-    <div style="position: absolute; top: 20px; right: 20px;">
-        <a href="{% url 'bin_report' %}" style="text-decoration: none; background-color: #007bff; color: #fff; padding: 10px 20px; border-radius: 5px;">My Collected Bin Report</a>
+
+    <div class="sidebar right-sidebar">
+        <img src="/static/dd1.jpg" alt="Bin Image 1">
+        <img src="/static/dd2.jpg" alt="Bin Image 2">
+        <img src="/static/dd3.jpg" alt="Bin Image 3">
     </div>
-    <div style="position: absolute; top: 15px; right: 20px;">
-        <a href="{% url 'lodged_complaint_report' %}" class="report-button">My Lodged Complaints Report</a>
-    </div>
-    <div style="position: absolute; top: 100px; right: 20px;">
-        <a href="{% url 'driver_complaint_chart' %}" class="report-button">Compaints Distribution Chart</a>
-    </div>
-    <div style="position: absolute; top: 200px; right: 20px;">
-        <a href="{% url 'driver_bin_chart' %}" class="report-button">Bin Distribution Chart</a>
-    </div>
-    
 </body>
 </html>

@@ -22,4 +22,5 @@ urlpatterns = [
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('admin/', admin.site.urls),
     path('', include('bincol_pro.urls')),
+    
 ]
